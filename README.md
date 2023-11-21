@@ -1,5 +1,19 @@
-# Tour de App - Generic boilerplate
+# Piráti z Darknetu
 
-Šablona pro vývoj aplikace pro Tour de App obsahující pouze GitHub Action s vytvořením a nahráním výstupu.
-Je potřeba přidat Dockerfile, který na základě zdrojového kódu aplikace vytvoří docker image vaší aplikace. 
-Aplikace může běžet na libovolném portu zpřístupněném pomocí příkazu `EXPOSE PORT_NUMBER` ve vaší Dockerfile.
+Ahoj cestovateli temnotami! Vítej v našem utajeném přístavu pro všechny, kdo hledají poklady v digitálním oceánu. Nejde nám o poklady na lodiach, ale o ty digitální – kódy, aplikace a technologické dobrodružství.
+
+## Co tady děláme
+
+Tým Pirátů z Darknetu se věnuje zkoumání digitálních hlubin za účelem objevení nových technologických pokladů. Naše dovednosti v programování a vývoji aplikací nám pomáhají zůstat kroky před ostatními.
+
+## Pirátský kódex
+
+1. **Zákon prvořadý:** Nezasahujeme do nelegálních činností. Naše dobrodružství je zaměřeno na technologický vývoj a inovace.
+
+2. **Sdílení znalostí:** Sdílíme znalosti a zkušenosti mezi členy posádky. Společně rosteme.
+  
+3. **Srandy kopec:** Zábava je to nejdůležitější
+
+##
+
+A teď vyplujme do neznámých digitálních vod a hledejme poklady společně! Yo ho ho!
