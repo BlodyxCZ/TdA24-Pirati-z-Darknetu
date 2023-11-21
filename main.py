@@ -6,6 +6,10 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
+@app.route("/lecturer")
+def lecturer():
+    return render_template("lecturer.html")
+
 @app.route("/api")
 def api():
     # Portal reference
