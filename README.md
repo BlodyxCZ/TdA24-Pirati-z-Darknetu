@@ -11,7 +11,7 @@ Tým Pirátů z Darknetu se věnuje zkoumání digitálních hlubin za účelem 
 1. **Zákon prvořadý:** Nezasahujeme do nelegálních činností. Naše dobrodružství je zaměřeno na technologický vývoj a inovace.
 
 2. **Sdílení znalostí:** Sdílíme znalosti a zkušenosti mezi členy posádky. Společně rosteme.
-  
+
 3. **Srandy kopec:** Zábava je to nejdůležitější
 
 ##
