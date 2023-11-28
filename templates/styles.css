@@ -4,7 +4,7 @@
 }
 
 .MainBuble {
-    width: 75%;
+    width: 60%;
     height: 75%;
     position: absolute;
     background-color: #74c7d3;
@@ -15,7 +15,7 @@
 }
 
 .Container {
-    display: inline-flex;
+    display: flex;
 }
 
 .ProfilePicture {
@@ -28,7 +28,7 @@
 }
 
 .InfoBox {
-    width: 54em;
+    flex: 1;
     height: 300px;
     margin-top: 20px;
     margin-right: 20px;
@@ -52,7 +52,7 @@
 }
 
 #claim {
-    font-size: 32px;
+    font-size: 28px;
 }
 
 .Bio {
