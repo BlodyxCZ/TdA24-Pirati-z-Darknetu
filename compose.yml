@@ -1,0 +1,16 @@
+services:
+  tda:
+    container_name: tda
+    build: ./
+    ports:
+      - 80:80
+    develop:
+      watch:
+        - action: rebuild
+          path: ./requirements.txt
+        - action: sync+restart
+          path: ./templates
+          target: /app/templates
+        - action: sync+restart
+          path: ./main.py
+          target: /app/main.py
