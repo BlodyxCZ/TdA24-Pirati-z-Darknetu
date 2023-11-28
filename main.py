@@ -58,7 +58,10 @@ async def main():
     print("Starting server...")
     atexit.register(exit_handler)
     print("Connecting to database...")
-    await db.init()
+    try:
+        await db.init()
+    except:
+        print("Failed to connect to database! Continuing anyway...")
     print("Starting webserver...")
     app.run(port=80, host="0.0.0.0")
 
