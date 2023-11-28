@@ -27,11 +27,13 @@ html,body{ margin:0; padding:0; height:100%; width:100%; }
 
 .ProfilePicture {
     width: 300px;
-    height: 300px;
+    height: auto;
     margin-top: 20px;
     margin-left: 20px;
     margin-right: 20px;
     background-color: #ffffff;
+    object-fit: contain;
+    border-radius: 24px;
 }
 
 .InfoBox {
