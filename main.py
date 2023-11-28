@@ -1,8 +1,15 @@
 from flask import Flask, render_template
 import atexit
 import db as db
+import asyncio
 
 app = Flask(__name__)
+
+# CSS
+
+@app.route("/styles.css")
+def css():
+    return app.send_static_file("styles.css")
 
 # Pages
 
@@ -22,8 +29,8 @@ def api():
     return {"secret": "The cake is a lie"}, 200 """
 
 @app.route("/lecturers", methods=["GET"])
-def get_lecturers():
-    return "WIP", 404
+async def get_lecturers():
+    return await db.get_lecturers(), 200
 
 @app.route("/lecturers/<int:uuid>", methods=["GET"])
 def get_lecturer(uuid):
@@ -47,7 +54,13 @@ def exit_handler():
     print("Closing database connection...")
     db.close()
 
-if __name__ == "__main__":
+async def main():
+    print("Starting server...")
     atexit.register(exit_handler)
-    db.init()
+    print("Connecting to database...")
+    await db.init()
+    print("Starting webserver...")
     app.run(port=80, host="0.0.0.0")
+
+if __name__ == "__main__":
+   asyncio.run(main())
