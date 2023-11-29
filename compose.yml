@@ -14,3 +14,6 @@ services:
         - action: sync+restart
           path: ./main.py
           target: /app/main.py
+        - action: sync+restart
+          path: ./static
+          target: /app/static

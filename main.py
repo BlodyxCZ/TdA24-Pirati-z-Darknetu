@@ -2,14 +2,21 @@ from flask import Flask, render_template
 import atexit
 import db as db
 import asyncio
+import sass
+import os
+
+# SCSS
+
+sass.compile(dirname=('static/scss', 'static/css'), output_style='compressed')
+
 
 app = Flask(__name__)
 
 # CSS
 
-@app.route("/styles.css")
+@app.route("/css/styles.css")
 def css():
-    return app.send_static_file("styles.css")
+    return app.send_static_file("css/styles.css")
 
 # Pages
 
