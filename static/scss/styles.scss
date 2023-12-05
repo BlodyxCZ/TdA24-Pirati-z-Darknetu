@@ -6,10 +6,7 @@
 html {
     font-size: 24px;
     font-family: 'Times New Roman', Times, serif;
-
-    @media (prefers-color-scheme: dark) {
-        background: #222;
-    }
+    background: lightblue;
 }
 
 .fullscreen {
@@ -34,18 +31,49 @@ html {
 }
 
 .lecturer {
-    max-width: 1000px;
-    background: lightblue;
-    border-radius: 1em;
-    padding: 2em;
+    max-width: 1200px;
     margin: 2em;
-    gap: 1em;
-    box-shadow: 1em 0.5em 0.5em #0005;
+    gap: 0em;
 
-    .split-h {
-        @media screen and (max-width: 800px) {
+    >div {
+        box-shadow: 1em 0.5em 0.5em #0005;
+    }
+
+    >div:first-child {
+        background: #fff;
+        padding: 2em 1em 2em 2em;
+        border-radius: 1em 0 0 1em;
+    }
+
+    .sidebar {
+        background: #222;
+        padding: 2em 2em 2em 1em;
+        border-radius: 0 1em 1em 0;
+        color: #eee;
+        white-space: nowrap;
+    }
+
+    .split-v {
+        gap: 1em;
+    }
+
+    @media screen and (max-width: 1000px) {
+        flex-direction: column;
+        gap: 0;
+
+        .split-h {
             flex-direction: column;
             gap: 1em;
+        }
+
+        >div:first-child {
+            padding: 2em 2em 1em 2em;
+            border-radius: 1em 1em 0 0;
+        }
+
+        .sidebar {
+            padding: 1em 2em 2em 2em;
+            border-radius: 0 0 1em 1em;
         }
     }
 }
