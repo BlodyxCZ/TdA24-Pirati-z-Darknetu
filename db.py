@@ -1,11 +1,12 @@
 from surrealdb import Surreal
 from main import loop
+import os
 
 db = Surreal()
 
 
 async def init() -> None:
-    await db.connect("http://localhost:8000/rpc")
+    await db.connect("http://" + os.environ["DATABASE_ADDRESS"] + "/rpc")
     await db.use("test", "test")
 
 
