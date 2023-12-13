@@ -33,6 +33,6 @@ services:
       - 8000
     volumes:
       - ./db:/mydata
-    command: start file:/mydata/database.db
+    command: start file:/mydata/database.db --auth --user root --pass root
 networks:
   surrealnet:

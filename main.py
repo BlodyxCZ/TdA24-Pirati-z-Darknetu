@@ -1,9 +1,8 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import atexit
 import db as db
 import asyncio
 import sass
-import os
 
 # SCSS
 
@@ -35,29 +34,33 @@ def api():
     # Portal reference
     return {"secret": "The cake is a lie"}, 200 """
 
-@app.route("/lecturers", methods=["GET"])
+@app.route("/api/lecturers", methods=["GET"])
 def get_lecturers():
     lecturers = db.get_lecturers()
     return lecturers, 200
 
-@app.route("/lecturers/<uuid>", methods=["GET"])
+@app.route("/api/lecturers/<uuid>", methods=["GET"])
 def get_lecturer(uuid):
     lecturer = db.get_lecturer(uuid)
     if lecturer is None:
         return {"code": 404, "message": "User not found"}, 404
     return lecturer, 200
 
-@app.route("/lecturers", methods=["POST"])
+@app.route("/api/lecturers", methods=["POST"])
 def post_lecturer():
-    return "WIP", 404
+    response = db.post_lecturer(request.get_json())
+    return response, 201
 
-@app.route("/lecturers/<uuid>", methods=["PUT"])
+@app.route("/api/lecturers/<uuid>", methods=["PUT"])
 def put_lecturer(uuid):
     return "WIP", 404
 
-@app.route("/lecturers/<uuid>", methods=["DELETE"])
+@app.route("/api/lecturers/<uuid>", methods=["DELETE"])
 def delete_lecturer(uuid):
-    return "WIP", 404
+    success = db.delete_lecturer(uuid)
+    if success:
+        return {"code": 204, "message": "User deleted"}, 204
+    return {"code": 404, "message": "User not found"}, 404
 
 # Server utilities
 
