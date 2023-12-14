@@ -53,7 +53,10 @@ def post_lecturer():
 
 @app.route("/api/lecturers/<uuid>", methods=["PUT"])
 def put_lecturer(uuid):
-    return "WIP", 404
+    lecturer = db.put_lecturer(uuid, request.get_json())
+    if lecturer == None:
+        return {"code": 404, "message": "User not found"}, 404
+    return lecturer, 200
 
 @app.route("/api/lecturers/<uuid>", methods=["DELETE"])
 def delete_lecturer(uuid):

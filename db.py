@@ -58,11 +58,27 @@ def post_lecturer(data) -> dict:
         "data": data
     }))[0]["result"][0]
 
-    lecturer["tags"] = loop.run_until_complete(db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM $tags", {
+    lecturer["tags"] = loop.run_until_complete(db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM $tags", vars={
         "tags": data["tags"]
     }))[0]["result"]
     
     return lecturer
+
+
+def put_lecturer(uuid, data) -> dict or None:
+    if data == {}:
+        return loop.run_until_complete(db.query('SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers WHERE id = type::thing("lecturers", $uuid);', vars= {
+            "uuid": uuid
+        }))[0]["result"][0]
+
+    lecturer = loop.run_until_complete(db.query('IF (SELECT * FROM type::thing("lecturers", $id)) = [] THEN RETURN null; ELSE UPDATE type::thing("lecturers", $id) MERGE $data; END;', vars={
+        "id": uuid,
+        "data": data
+    }))[0]["result"]
+
+    if lecturer == None:
+        return None
+    return lecturer[0]
 
 
 def delete_lecturer(uuid) -> bool:

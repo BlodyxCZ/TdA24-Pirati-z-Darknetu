@@ -2,8 +2,8 @@ FROM python:3.12.0-bookworm
 WORKDIR /app
 ARG verze
 COPY . .
-RUN pip install -r requirements.txt
-ENTRYPOINT python main.py $port
+RUN pip install --no-cache-dir -r requirements.txt
+ENTRYPOINT [ "python", "main.py" ]
 EXPOSE 80
 
 # Databáze
