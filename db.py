@@ -8,7 +8,7 @@ db = Surreal()
 
 async def init() -> None:
     await db.connect("http://" + os.environ["DATABASE_ADDRESS"] + "/rpc")
-    await db.signin({"user": "root", "pass": "root"})
+    await db.signin({"user": "root", "pass": "Z26E7n9rwBJYxeFLHsjCVbmWdypUTu4tPNRK38fczGqQhAD5Xv"})
     await db.use("test", "test")
 
 
