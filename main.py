@@ -3,6 +3,7 @@ import atexit
 import db as db
 import asyncio
 import sass
+import logging
 
 # SCSS
 
@@ -10,6 +11,7 @@ sass.compile(dirname=('static/scss', 'static/css'), output_style='compressed')
 
 loop = asyncio.get_event_loop()
 app = Flask(__name__)
+
 
 # CSS
 
@@ -67,11 +69,18 @@ def delete_lecturer(uuid):
 
 # Server utilities
 
+@app.route("/api/log")
+def log():
+    with open("logs.log", "r") as file:
+        return file.read(), 200
+
+
 def exit_handler() -> None:
     print("Closing database connection...")
     loop.run_until_complete(db.close())
 
 def main() -> None:
+    logging.basicConfig(filename="logs.log", filemode="w", format="%(name)s → %(levelname)s: %(message)s")
     print("Starting server...")
     atexit.register(exit_handler)
     print("Connecting to database...")
