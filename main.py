@@ -80,7 +80,7 @@ def exit_handler() -> None:
     loop.run_until_complete(db.close())
 
 def main() -> None:
-    logging.basicConfig(filename="logs.log", filemode="w", format="%(name)s → %(levelname)s: %(message)s")
+    logging.basicConfig(filename="logs.log", filemode="w", format="%(name)s → %(levelname)s: %(message)s<br>")
     print("Starting server...")
     atexit.register(exit_handler)
     print("Connecting to database...")
