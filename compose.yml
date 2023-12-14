@@ -4,6 +4,12 @@ services:
     build: ./
     ports:
       - 80:80
+    networks:
+      - surrealnet
+    depends_on:
+      - surrealdb
+    environment:
+      - DATABASE_ADDRESS=surrealdb:8000
     develop:
       watch:
         - action: rebuild
@@ -14,3 +20,19 @@ services:
         - action: sync+restart
           path: ./main.py
           target: /app/main.py
+        - action: sync+restart
+          path: ./static
+          target: /app/static
+  surrealdb:
+    image: surrealdb/surrealdb:latest
+    user: root
+    restart: always
+    networks:
+      - surrealnet
+    expose:
+      - 8000
+    volumes:
+      - ./db:/mydata
+    command: start file:/mydata/database.db --auth --user root --pass root
+networks:
+  surrealnet:
