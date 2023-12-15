@@ -17,3 +17,7 @@ Tým Pirátů z Darknetu se věnuje zkoumání digitálních hlubin za účelem 
 ##
 
 A teď vyplujme do neznámých digitálních vod a hledejme poklady společně! Yo ho ho!
+
+## Heslo databáze
+
+K nastavení heslo do databáze použít stránku /dbpasswd nebo vytvořit soubor password.txt a napsat heslo do něj.
