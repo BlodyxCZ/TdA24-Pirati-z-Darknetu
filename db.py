@@ -7,13 +7,16 @@ db = Surreal()
 
 
 async def init() -> None:
-    with open("password.txt", "r") as file:
-        password = file.read()
-        if password == "":
-            return
-        await db.connect("http://" + os.environ.get("DATABASE_ADDRESS", "ondradoksy.com:8000") + "/rpc")
-        await db.signin({"user": "root", "pass": password})
-        await db.use("test", "test")
+    try:
+        with open("password.txt", "r") as file:
+            password = file.read()
+            if password == "":
+                return
+            await db.connect("http://" + os.environ.get("DATABASE_ADDRESS", "ondradoksy.com:8000") + "/rpc")
+            await db.signin({"user": "root", "pass": password})
+            await db.use("test", "test")
+    except FileNotFoundError:
+        return
 
 
 def get_lecturers() -> list:
