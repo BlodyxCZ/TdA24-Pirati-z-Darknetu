@@ -1,4 +1,5 @@
 flask
-flask[async]
+nest-asyncio
 surrealdb
 libsass
+flask-expects-json

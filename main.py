@@ -5,8 +5,11 @@ import asyncio
 import sass
 import logging
 import sys
+from flask_expects_json import expects_json
+from schemas import *
+import nest_asyncio
 
-loop = asyncio.get_event_loop()
+nest_asyncio.apply()
 app = Flask(__name__)
 
 # SCSS
@@ -31,6 +34,7 @@ def index():
 @app.route("/lecturer")
 def lecturer():
     return render_template("lecturer.html")
+
 
 @app.route("/dbpasswd")
 def update_password():
@@ -60,6 +64,7 @@ def get_lecturer(uuid):
 
 
 @app.route("/api/lecturers", methods=["POST"])
+@expects_json(lecturer_post_schema)
 def post_lecturer():
     response = db.post_lecturer(request.get_json())
     return response, 201
@@ -85,11 +90,13 @@ def delete_lecturer(uuid):
 
 @app.before_request
 def check_db_connection_before_request():
+    loop = asyncio.get_event_loop()
     loop.run_until_complete(db.init())
 
 
 @app.route("/api/conn")
 def check_db_connection():
+    loop = asyncio.get_event_loop()
     loop.run_until_complete(db.init())
     return {"msg": "Tried to renew connection."}, 200
 
@@ -98,7 +105,8 @@ def check_db_connection():
 def log():
     with open("logs.log", "r") as file:
         return file.read(), 200
-    
+
+
 @app.route("/api/dbpasswd", methods=["POST"])
 def post_update_password():
     with open("password.txt", "w+") as file:
@@ -107,16 +115,18 @@ def post_update_password():
 
 
 def exit_handler() -> None:
+    loop = asyncio.get_event_loop()
     print("Closing database connection...")
     loop.run_until_complete(db.close())
 
 
 def main() -> None:
+    loop = asyncio.get_event_loop()
     logging.basicConfig(filename="logs.log", filemode="w", format="%(name)s → %(levelname)s: %(message)s<br>")
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     print("Starting server...")
     atexit.register(exit_handler)
-    print("Connecting to database...") 
+    print("Connecting to database...")
     try:
         loop.run_until_complete(db.init())
     except:
