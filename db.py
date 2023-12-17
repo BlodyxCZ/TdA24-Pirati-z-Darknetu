@@ -1,10 +1,19 @@
 from surrealdb import Surreal
-from main import loop
+from asyncio import get_event_loop
 import os
 import re
 
 db = Surreal()
 
+""" def check_db_connection() -> bool:
+    loop = get_event_loop()
+    try:
+        if loop.run_until_complete(db.query("SELECT 1;"))[0]["result"] == 1:
+            return True
+        else:
+            return False
+    except:
+        return False """
 
 async def init() -> None:
     try:
@@ -12,7 +21,7 @@ async def init() -> None:
             password = file.read()
             if password == "":
                 return
-            await db.connect("http://" + os.environ.get("DATABASE_ADDRESS", "ondradoksy.com:8000") + "/rpc")
+            await db.connect("ws://" + os.environ.get("DATABASE_ADDRESS", "ondradoksy.com:8000") + "/rpc")
             await db.signin({"user": "root", "pass": password})
             await db.use("test", "test")
     except FileNotFoundError:
@@ -20,6 +29,7 @@ async def init() -> None:
 
 
 def get_lecturers() -> list:
+    loop = get_event_loop()
     lecturers = loop.run_until_complete(db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers;"))[0]["result"]
     
     for lecturer in lecturers:
@@ -31,6 +41,7 @@ def get_lecturers() -> list:
 
 
 def get_lecturer(uuid) -> dict or None:
+    loop = get_event_loop()
     lecturer = loop.run_until_complete(db.query('SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers WHERE id = type::thing("lecturers", $uuid);', vars= {
         "uuid": uuid
     }))[0]["result"]
@@ -48,6 +59,7 @@ def get_lecturer(uuid) -> dict or None:
 
 
 def post_lecturer(data) -> dict:
+    loop = get_event_loop()
     data["bio"] = re.sub(r"<(?!\/?(b|i|u|strong|em)(?=>|\s.*>))\/?.*?>", "", data["bio"]) # remove unallowed HTML tags
     
     if "tags" in data:
@@ -73,6 +85,7 @@ def post_lecturer(data) -> dict:
 
 
 def put_lecturer(uuid, data) -> dict or None:
+    loop = get_event_loop()
     if data == {}:
         return loop.run_until_complete(db.query('SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers WHERE id = type::thing("lecturers", $uuid);', vars= {
             "uuid": uuid
@@ -89,6 +102,7 @@ def put_lecturer(uuid, data) -> dict or None:
 
 
 def delete_lecturer(uuid) -> bool:
+    loop = get_event_loop()
     result = loop.run_until_complete(db.query('DELETE type::thing("lecturers", $uuid) RETURN BEFORE;', {
         "uuid": uuid
     }))[0]["result"]
