@@ -3,3 +3,6 @@ nest-asyncio
 surrealdb
 libsass
 flask-expects-json
+pytest
+pytest-depends
+requests

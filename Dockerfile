@@ -3,7 +3,7 @@ WORKDIR /app
 ARG verze
 COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
-ENTRYPOINT [ "python", "main.py" ]
+ENTRYPOINT [ "python", "src/main.py" ]
 EXPOSE 80
 
 # Databáze

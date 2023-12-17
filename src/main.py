@@ -8,6 +8,9 @@ import sys
 from flask_expects_json import expects_json
 from schemas import *
 import nest_asyncio
+import os
+
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 nest_asyncio.apply()
 app = Flask(__name__)

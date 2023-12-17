@@ -15,14 +15,11 @@ services:
         - action: rebuild
           path: ./requirements.txt
         - action: sync+restart
-          path: ./templates
-          target: /app/templates
-        - action: sync+restart
-          path: ./main.py
-          target: /app/main.py
-        - action: sync+restart
-          path: ./static
-          target: /app/static
+          path: ./src
+          target: /app/src
+        - action: sync
+          path: ./tests
+          target: /app/tests
 #   surrealdb:
 #     image: surrealdb/surrealdb:latest
 #     user: root
