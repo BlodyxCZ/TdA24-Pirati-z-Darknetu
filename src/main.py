@@ -26,13 +26,22 @@ sass.compile(dirname=('static/scss', 'static/css'), output_style='compressed')
 def css():
     return app.send_static_file("css/styles.css")
 
+# JS
+
+@app.route("/js/log.js")
+def js():
+    return app.send_static_file("js/log.js")
+
 # Pages
 
 
-""" @app.route("/")
+@app.route("/")
 def index():
-    return render_template("index.html") """
+    return render_template("index.html")
 
+@app.route("/log")
+def log_page():
+    return render_template("log.html")
 
 @app.route("/lecturer")
 def lecturer():
@@ -121,11 +130,12 @@ def exit_handler() -> None:
     loop = asyncio.get_event_loop()
     print("Closing database connection...")
     loop.run_until_complete(db.close())
+    os.exit(0)
 
 
 def main() -> None:
     loop = asyncio.get_event_loop()
-    logging.basicConfig(filename="logs.log", filemode="w", format="%(name)s → %(levelname)s: %(message)s<br>")
+    logging.basicConfig(filename="logs.log", filemode="w", format="[%(asctime)s] [%(levelname)s] : %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     print("Starting server...")
     atexit.register(exit_handler)
