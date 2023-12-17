@@ -103,10 +103,8 @@ def delete_lecturer(uuid):
 @app.before_request
 def check_db_connection_before_request():
     if not db.check_db_connection():
-        db.init()
-    # asyncio.run(db.init())
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete(db.init())
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(db.init())
 
 
 @app.route("/api/conn")

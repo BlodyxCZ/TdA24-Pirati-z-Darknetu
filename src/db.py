@@ -22,15 +22,16 @@ def check_db_connection() -> bool:
         return False
     return conn.is_connected()
 
-def init() -> None:
+async def init() -> None:
     try:
         with open("password.txt", "r") as file:
             password = file.read()
             if password == "":
                 return
-            conn = db.connect("ws://" + os.environ.get("DATABASE_ADDRESS", "ondradoksy.com:8000") + "/rpc")
-            db.signin({"user": "root", "pass": password})
-            db.use("test", "test")
+            print("Connecting to database...")
+            conn = await db.connect("ws://" + os.environ.get("DATABASE_ADDRESS", "ondradoksy.com:8000") + "/rpc")
+            await db.signin({"user": "root", "pass": password})
+            await db.use("test", "test")
     except FileNotFoundError:
         return
 
