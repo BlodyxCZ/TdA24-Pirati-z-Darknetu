@@ -1,8 +1,6 @@
-flask
-nest-asyncio
+quart
 surrealdb
 libsass
-flask-expects-json
 pytest
 pytest-depends
 requests

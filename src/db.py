@@ -23,6 +23,8 @@ def check_db_connection() -> bool:
     return conn.is_connected()
 
 async def init() -> None:
+    global conn
+
     try:
         with open("password.txt", "r") as file:
             password = file.read()
@@ -36,21 +38,19 @@ async def init() -> None:
         return
 
 
-def get_lecturers() -> list:
-    loop = get_event_loop()
-    lecturers = loop.run_until_complete(db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers;"))[0]["result"]
+async def get_lecturers() -> list:
+    lecturers = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers;"))[0]["result"]
     
     for lecturer in lecturers:
-        lecturer["tags"] = loop.run_until_complete(db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM $tags", {
+        lecturer["tags"] = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM $tags", {
             "tags": lecturer["tags"]
         }))[0]["result"]
 
     return lecturers
 
 
-def get_lecturer(uuid) -> dict or None:
-    loop = get_event_loop()
-    lecturer = loop.run_until_complete(db.query('SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers WHERE id = type::thing("lecturers", $uuid);', vars= {
+async def get_lecturer(uuid) -> dict or None:
+    lecturer = (await db.query('SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers WHERE id = type::thing("lecturers", $uuid);', vars= {
         "uuid": uuid
     }))[0]["result"]
     
@@ -59,21 +59,20 @@ def get_lecturer(uuid) -> dict or None:
     
     lecturer = lecturer[0]
 
-    lecturer["tags"] = loop.run_until_complete(db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM $tags", {
+    lecturer["tags"] = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM $tags", {
         "tags": lecturer["tags"]
     }))[0]["result"]
 
     return lecturer
 
 
-def post_lecturer(data) -> dict:
-    loop = get_event_loop()
+async def post_lecturer(data) -> dict:
     data["bio"] = re.sub(r"<(?!\/?(b|i|u|strong|em)(?=>|\s.*>))\/?.*?>", "", data["bio"]) # remove unallowed HTML tags
     
     if "tags" in data:
         tags = []
         for tag in data["tags"]:
-            tags.append(loop.run_until_complete(db.query("IF (SELECT * FROM tags WHERE name = $tag) = [] THEN SELECT VALUE id FROM (CREATE tags:uuid() SET name = $tag); ELSE SELECT VALUE id FROM tags WHERE name = $tag; END;", vars={
+            tags.append((await db.query("IF (SELECT * FROM tags WHERE name = $tag) = [] THEN SELECT VALUE id FROM (CREATE tags:uuid() SET name = $tag); ELSE SELECT VALUE id FROM tags WHERE name = $tag; END;", vars={
                 "tag": tag["name"]
             }))[0]["result"][0])
 
@@ -81,25 +80,24 @@ def post_lecturer(data) -> dict:
     else:
         data["tags"] = []
     
-    lecturer = loop.run_until_complete(db.query("SELECT *, meta::id(id) AS uuid OMIT id, tags FROM (CREATE lecturers:uuid() CONTENT $data);", vars={
+    lecturer = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id, tags FROM (CREATE lecturers:uuid() CONTENT $data);", vars={
         "data": data
     }))[0]["result"][0]
 
-    lecturer["tags"] = loop.run_until_complete(db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM $tags", vars={
+    lecturer["tags"] = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM $tags", vars={
         "tags": data["tags"]
     }))[0]["result"]
     
     return lecturer
 
 
-def put_lecturer(uuid, data) -> dict or None:
-    loop = get_event_loop()
+async def put_lecturer(uuid, data) -> dict or None:
     if data == {}:
-        return loop.run_until_complete(db.query('SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers WHERE id = type::thing("lecturers", $uuid);', vars= {
+        return (await db.query('SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers WHERE id = type::thing("lecturers", $uuid);', vars= {
             "uuid": uuid
         }))[0]["result"][0]
 
-    lecturer = loop.run_until_complete(db.query('IF (SELECT * FROM type::thing("lecturers", $id)) = [] THEN RETURN null; ELSE UPDATE type::thing("lecturers", $id) MERGE $data; END;', vars={
+    lecturer = (await db.query('IF (SELECT * FROM type::thing("lecturers", $id)) = [] THEN RETURN null; ELSE UPDATE type::thing("lecturers", $id) MERGE $data; END;', vars={
         "id": uuid,
         "data": data
     }))[0]["result"]
@@ -109,9 +107,8 @@ def put_lecturer(uuid, data) -> dict or None:
     return lecturer[0]
 
 
-def delete_lecturer(uuid) -> bool:
-    loop = get_event_loop()
-    result = loop.run_until_complete(db.query('DELETE type::thing("lecturers", $uuid) RETURN BEFORE;', {
+async def delete_lecturer(uuid) -> bool:
+    result = (await db.query('DELETE type::thing("lecturers", $uuid) RETURN BEFORE;', {
         "uuid": uuid
     }))[0]["result"]
 

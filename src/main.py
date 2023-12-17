@@ -1,19 +1,15 @@
-from flask import Flask, render_template, request
+from quart import Quart, render_template, request
 import atexit
 import db as db
-import asyncio
 import sass
 import logging
 import sys
-from flask_expects_json import expects_json
 from schemas import *
-import nest_asyncio
 import os
 
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
-nest_asyncio.apply()
-app = Flask(__name__)
+app = Quart(__name__)
 
 # SCSS
 
@@ -23,34 +19,34 @@ sass.compile(dirname=('static/scss', 'static/css'), output_style='compressed')
 
 
 @app.route("/css/styles.css")
-def css():
-    return app.send_static_file("css/styles.css")
+async def css():
+    return await app.send_static_file("css/styles.css")
 
 # JS
 
 @app.route("/js/<file>.js")
-def js(file):
-    return app.send_static_file("js/" + file +".js")
+async def js(file):
+    return await app.send_static_file("js/" + file +".js")
 
 # Pages
 
 
 @app.route("/")
-def index():
-    return render_template("index.html")
+async def index():
+    return await render_template("index.html")
 
 @app.route("/log")
-def log_page():
-    return render_template("log.html")
+async def log_page():
+    return await render_template("log.html")
 
 @app.route("/lecturer")
-def lecturer():
-    return render_template("lecturer.html")
+async def lecturer():
+    return await render_template("lecturer.html")
 
 
 @app.route("/dbpasswd")
-def update_password():
-    return render_template("dbpasswd.html")
+async def update_password():
+    return await render_template("dbpasswd.html")
 
 # API
 
@@ -62,37 +58,40 @@ def api():
 
 
 @app.route("/api/lecturers", methods=["GET"])
-def get_lecturers():
-    lecturers = db.get_lecturers()
+async def get_lecturers():
+    lecturers = await db.get_lecturers()
     return lecturers, 200
 
 
 @app.route("/api/lecturers/<uuid>", methods=["GET"])
-def get_lecturer(uuid):
-    lecturer = db.get_lecturer(uuid)
+async def get_lecturer(uuid):
+    lecturer = await db.get_lecturer(uuid)
     if lecturer is None:
         return {"code": 404, "message": "User not found"}, 404
     return lecturer, 200
 
 
 @app.route("/api/lecturers", methods=["POST"])
-@expects_json(lecturer_post_schema)
-def post_lecturer():
-    response = db.post_lecturer(request.get_json())
+async def post_lecturer():
+    data = await request.get_json()
+    #if not validate_post_lecturer(data):
+    #    return {"code": 400, "message": "Invalid request body"}, 400
+
+    response = await db.post_lecturer(data)
     return response, 201
 
 
 @app.route("/api/lecturers/<uuid>", methods=["PUT"])
-def put_lecturer(uuid):
-    lecturer = db.put_lecturer(uuid, request.get_json())
+async def put_lecturer(uuid):
+    lecturer = await db.put_lecturer(uuid, await request.get_json())
     if lecturer == None:
         return {"code": 404, "message": "User not found"}, 404
     return lecturer, 200
 
 
 @app.route("/api/lecturers/<uuid>", methods=["DELETE"])
-def delete_lecturer(uuid):
-    success = db.delete_lecturer(uuid)
+async def delete_lecturer(uuid):
+    success = await db.delete_lecturer(uuid)
     if success:
         return {"code": 204, "message": "User deleted"}, 204
     return {"code": 404, "message": "User not found"}, 404
@@ -101,36 +100,33 @@ def delete_lecturer(uuid):
 
 
 @app.before_request
-def check_db_connection_before_request():
+async def check_db_connection_before_request():
     if not db.check_db_connection():
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(db.init())
+        await db.init()
 
 
 @app.route("/api/conn")
-def check_db_connection():
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(db.init())
+async def check_db_connection():
+    await db.init()
     return {"msg": "Tried to renew connection."}, 200
 
 
 @app.route("/api/log")
-def log():
+async def log():
     with open("logs.log", "r") as file:
         return file.read(), 200
 
 
 @app.route("/api/dbpasswd", methods=["POST"])
-def post_update_password():
+async def post_update_password():
     with open("password.txt", "w+") as file:
-        file.write(request.form["password"])
+        file.write((await request.form)["password"])
         return "Updated database password", 200
 
 
-def exit_handler() -> None:
-    loop = asyncio.get_event_loop()
+async def exit_handler() -> None:
     print("Closing database connection...")
-    loop.run_until_complete(db.close())
+    await db.close()
     os.exit(0)
 
 
@@ -139,14 +135,13 @@ def main() -> None:
     with open("logs.log", "w+") as file:
         file.write("")
     
-    loop = asyncio.get_event_loop()
     logging.basicConfig(filename="logs.log", filemode="w", format="[%(levelname)s] : %(message)s")
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     print("Starting server...")
     atexit.register(exit_handler)
     print("Connecting to database...")
     try:
-        loop.run_until_complete(db.init())
+        pass #db.init()
     except:
         print("Failed to connect to database! Continuing anyway...")
     print("Starting webserver...")

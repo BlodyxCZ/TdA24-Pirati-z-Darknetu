@@ -1,16 +1,28 @@
-lecturer_post_schema = {
+lecturer_schema = {
     "type": "object",
     "properties": {
-        "title_before": {"type": "string"},
-        "first_name": {"type": "string"},
-        "middle_name": {"type": "string"},
-        "last_name": {"type": "string"},
-        "title_after": {"type": "string"},
-        "picture_url": {"type": "string"},
-        "location": {"type": "string"},
-        "claim": {"type": "string"},
-        "bio": {"type": "string"},
-        "price_per_hour": {"type": "number"},
+        "first_name": {"type": str, "required": True},
+        "middle_name": {"type": str, "required": False},
+        "last_name": {"type": str, "required": True},
+        "title_before": {"type": str, "required": False},
+        "title_after": {"type": str, "required": False},
+        "picture_url": {"type": str, "required": True},
+        "location": {"type": str, "required": True},
+        "claim": {"type": str, "required": True},
+        "bio": {"type": str, "required": True},
+        "price_per_hour": {"type": int, "required": True},
+        "contact": {"type": dict, "required": True},
+        "tags": {"type": list, "required": False},
     },
-    "required": ["first_name", "last_name", "picture_url", "location", "claim", "bio", "price_per_hour"]
 }
+
+
+""" def validate_post_lecturer(data: dict) -> bool:
+    for key, prop in lecturer_schema:
+        if prop["required"]:
+            if key not in data or data[key] is None or (isinstance(data[key], str) and data[key].strip() == ""):
+                return False
+        if key in data and not isinstance(data[key], prop["type"]):
+            return False
+
+    return True """
