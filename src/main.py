@@ -102,8 +102,11 @@ def delete_lecturer(uuid):
 
 @app.before_request
 def check_db_connection_before_request():
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(db.init())
+    if not db.check_db_connection():
+        db.init()
+    # asyncio.run(db.init())
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete(db.init())
 
 
 @app.route("/api/conn")
@@ -134,8 +137,12 @@ def exit_handler() -> None:
 
 
 def main() -> None:
+    # Clear logs
+    with open("logs.log", "w+") as file:
+        file.write("")
+    
     loop = asyncio.get_event_loop()
-    logging.basicConfig(filename="logs.log", filemode="w", format="[%(asctime)s] [%(levelname)s] : %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+    logging.basicConfig(filename="logs.log", filemode="w", format="[%(levelname)s] : %(message)s")
     logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
     print("Starting server...")
     atexit.register(exit_handler)

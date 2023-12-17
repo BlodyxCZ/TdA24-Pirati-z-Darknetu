@@ -15,15 +15,22 @@ db = Surreal()
     except:
         return False """
 
-async def init() -> None:
+conn = None
+
+def check_db_connection() -> bool:
+    if conn == None:
+        return False
+    return conn.is_connected()
+
+def init() -> None:
     try:
         with open("password.txt", "r") as file:
             password = file.read()
             if password == "":
                 return
-            await db.connect("ws://" + os.environ.get("DATABASE_ADDRESS", "ondradoksy.com:8000") + "/rpc")
-            await db.signin({"user": "root", "pass": password})
-            await db.use("test", "test")
+            conn = db.connect("ws://" + os.environ.get("DATABASE_ADDRESS", "ondradoksy.com:8000") + "/rpc")
+            db.signin({"user": "root", "pass": password})
+            db.use("test", "test")
     except FileNotFoundError:
         return
 

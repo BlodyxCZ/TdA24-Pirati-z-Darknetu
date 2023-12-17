@@ -11,6 +11,9 @@ function update() {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
             const logContainer = document.getElementById("log");
             let lines = xmlHttp.responseText.split("\n");
+            if (lines.length < logContainer.children.length) {
+                logContainer.innerHTML = "";
+            }
             lines.splice(0, logContainer.children.length);
             let nodes = lines.map((l) => {
                 let element = document.createElement("div");
