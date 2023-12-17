@@ -6,7 +6,21 @@
 html {
     font-size: 24px;
     font-family: 'Times New Roman', Times, serif;
+    background: #222;
+    color: #eee;
+}
+
+#log {
+    background: #111;
+    color: #eee;
+    font-size: 0.75em;
+    overflow-y: scroll;
+    max-height: 100vh;
+}
+
+.lecturer-container {
     background: lightblue;
+    color: black;
 }
 
 .fullscreen {
