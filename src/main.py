@@ -28,9 +28,9 @@ def css():
 
 # JS
 
-@app.route("/js/log.js")
-def js():
-    return app.send_static_file("js/log.js")
+@app.route("/js/<file>.js")
+def js(file):
+    return app.send_static_file("js/" + file +".js")
 
 # Pages
 
