@@ -16,14 +16,16 @@ def get_random_lecturer():
     return {
         "title_before": "Bc.",
         "first_name": "Jan",
-        "middle_name": "",
+        "middle_name": "Jiří",
         "last_name": "Novák",
-        "title_after": "",
+        "title_after": "PhD.",
         "picture_url": "https://example.com/",
         "location": "Earth",
-        "claim": "None",
-        "bio": "asdf",
+        "claim": "Dlouhý text",
+        "bio": "Dlouhý text 2",
         "price_per_hour": 200,
+        "contact": {},
+        "tags": []
     }
 
 def get_special_lecturer():

@@ -74,8 +74,8 @@ async def get_lecturer(uuid):
 @app.route("/api/lecturers", methods=["POST"])
 async def post_lecturer():
     data = await request.get_json()
-    #if not validate_post_lecturer(data):
-    #    return {"code": 400, "message": "Invalid request body"}, 400
+    if not validate_post_lecturer(data):
+        return {"code": 400, "message": "Invalid request body"}, 400
 
     response = await db.post_lecturer(data)
     return response, 201
@@ -121,7 +121,9 @@ async def log():
 async def post_update_password():
     with open("password.txt", "w+") as file:
         file.write((await request.form)["password"])
-        return "Updated database password", 200
+
+    await db.init()
+    return "Updated database password", 200
 
 
 async def exit_handler() -> None:
@@ -140,10 +142,10 @@ def main() -> None:
     print("Starting server...")
     atexit.register(exit_handler)
     print("Connecting to database...")
-    try:
-        pass #db.init()
+    """ try:
+        db.init()
     except:
-        print("Failed to connect to database! Continuing anyway...")
+        print("Failed to connect to database! Continuing anyway...") """
     print("Starting webserver...")
     app.run(port=80, host="0.0.0.0")
 

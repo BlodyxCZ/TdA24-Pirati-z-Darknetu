@@ -1,5 +1,5 @@
 quart
-surrealdb
+surrealdb==0.3.1
 libsass
 pytest
 pytest-depends
