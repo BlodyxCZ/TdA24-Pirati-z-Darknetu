@@ -16,7 +16,7 @@ async def init() -> None:
             if password == "":
                 return
             print("Connecting to database...")
-            await db.connect("http://" + os.environ.get("DATABASE_ADDRESS", "ondradoksy.com:8000") + "/rpc")
+            await db.connect("http://" + os.environ.get("DATABASE_ADDRESS", "130.61.210.43:8000") + "/rpc")
             await db.signin({"user": "root", "pass": password})
             await db.use("test", "test")
     except FileNotFoundError:
@@ -89,6 +89,15 @@ async def put_lecturer(uuid, data) -> dict or None:
         return (await db.query('SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers WHERE id = type::thing("lecturers", $uuid);', vars= {
             "uuid": uuid
         }))[0]["result"][0]
+
+    if "tags" in data:
+        tags = []
+        for tag in data["tags"]:
+            tags.append((await db.query("LET $tag = (SELECT * FROM tags WHERE name = $data.name); IF array::len($tag) != 0 THEN RETURN $tag.id; ELSE RETURN (CREATE tags:uuid() SET name = $data.name).id; END;", vars= {
+                "data": tag
+            }))[1]["result"][0])
+
+        data["tags"] = tags
 
     lecturer = (await db.query('IF (SELECT * FROM type::thing("lecturers", $id)) = [] THEN RETURN null; ELSE SELECT *, meta::id(id) AS uuid OMIT id FROM (UPDATE type::thing("lecturers", $id) MERGE $data); END;', vars={
         "id": uuid,
