@@ -4,13 +4,9 @@ services:
     build: ./
     ports:
       - 80:80
-    # networks:
-    #   - surrealnet
-    # depends_on:
-    #   - surrealdb
     restart: always
     environment:
-      - DATABASE_ADDRESS=ondradoksy.com:8000
+      - DATABASE_ADDRESS=130.61.210.43:8000
     develop:
       watch:
         - action: rebuild
@@ -21,16 +17,3 @@ services:
         - action: sync
           path: ./tests
           target: /app/tests
-#   surrealdb:
-#     image: surrealdb/surrealdb:latest
-#     user: root
-#     restart: always
-#     networks:
-#       - surrealnet
-#     expose:
-#       - 8000
-#     volumes:
-#       - ./db:/mydata
-#     command: start file:/mydata/database.db --auth --user root --pass Z26E7n9rwBJYxeFLHsjCVbmWdypUTu4tPNRK38fczGqQhAD5Xv
-# networks:
-#   surrealnet:
