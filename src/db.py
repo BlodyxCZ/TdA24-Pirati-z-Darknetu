@@ -18,7 +18,7 @@ async def init() -> None:
             print("Connecting to database...")
             await db.connect("http://" + os.environ.get("DATABASE_ADDRESS", "130.61.210.43:8000") + "/rpc")
             await db.signin({"user": "root", "pass": password})
-            await db.use("test", "test")
+            await db.use("tda", "tda")
     except FileNotFoundError:
         return
 

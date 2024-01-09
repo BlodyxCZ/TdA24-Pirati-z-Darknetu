@@ -1,4 +1,4 @@
-from quart import Quart, render_template, request
+from quart import Quart, render_template, request, send_file
 import atexit
 import db as db
 import sass
@@ -22,6 +22,13 @@ app = Quart(__name__)
 # SCSS
 
 sass.compile(dirname=('static/scss', 'static/css'), output_style='compressed')
+
+# Favicon
+
+@app.route("/favicon.ico")
+async def favicon():
+    #return "ok", 200
+    return await send_file("favicon.ico")
 
 # CSS
 
@@ -55,6 +62,17 @@ async def lecturer():
 @app.route("/dbpasswd")
 async def update_password():
     return await render_template("dbpasswd.html")
+
+@app.route("/lecturer/<uuid>", methods=["GET"])
+async def lecturer_page(uuid):
+    lecturer = await db.get_lecturer(uuid)
+    if lecturer is None:
+        return await render_template("not_found.html"), 404
+    return await render_template("lecturer_template.html", lecturer=lecturer)
+
+""" @app.errorhandler(404)
+async def page_not_found(e):
+    return await render_template("not_found.html"), 404 """
 
 # API
 
