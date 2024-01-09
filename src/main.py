@@ -23,13 +23,6 @@ app = Quart(__name__)
 
 sass.compile(dirname=('static/scss', 'static/css'), output_style='compressed')
 
-# Favicon
-
-@app.route("/favicon.ico")
-async def favicon():
-    #return "ok", 200
-    return await send_file("favicon.ico")
-
 # CSS
 
 
@@ -67,12 +60,12 @@ async def update_password():
 async def lecturer_page(uuid):
     lecturer = await db.get_lecturer(uuid)
     if lecturer is None:
-        return await render_template("not_found.html"), 404
+        return await render_template("404.html"), 404
     return await render_template("lecturer_template.html", lecturer=lecturer)
 
-""" @app.errorhandler(404)
+@app.errorhandler(404)
 async def page_not_found(e):
-    return await render_template("not_found.html"), 404 """
+    return await render_template("404.html"), 404
 
 # API
 
@@ -125,10 +118,10 @@ async def delete_lecturer(uuid):
 # Server utilities
 
 
-@app.before_request
+""" @app.before_request
 async def check_db_connection_before_request():
     if not db.check_db_connection():
-        await db.init()
+        await db.init() """
 
 
 @app.route("/api/conn")

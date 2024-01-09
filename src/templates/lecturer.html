@@ -7,6 +7,7 @@
         <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
         <link href="https://fonts.googleapis.com/css?family=Lalezar" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="/css/styles.css">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
         <title>Tour de App</title>
     </head>
 
@@ -57,7 +58,7 @@
                             <div>Email: <a href="#">example@example.com</a></div>
                         </div>
                         <div class="tda-logo-container">
-                            <img src="/images/TdA_LOGO/TeacherDigitalAgency_LOGO_colour-white.png" />
+                            <img src="{{ url_for('static', filename='images/TdA_LOGO/TeacherDigitalAgency_LOGO_colour-white.png') }}" />
                         </div>
                     </div>
                 </div>
