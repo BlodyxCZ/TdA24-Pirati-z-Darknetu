@@ -1,3 +1,11 @@
+:root {
+    --prussian-blue: #00384d;
+    --sky-blue: #74c7d3;
+    --white: #ffffff;
+    --jet: #333333;
+    --sunglow: #fecb2e;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -5,22 +13,28 @@
 
 html {
     font-size: 24px;
-    font-family: 'Times New Roman', Times, serif;
-    background: #222;
-    color: #eee;
+    font-family: 'Open Sans';
+    font-style: normal;
+}
+
+@for $i from 1 through 6 {
+    h#{$i} {
+        font-family: 'Lalezar';
+        font-style: normal;
+    }
 }
 
 #log {
-    background: #111;
-    color: #eee;
+    background: var(--jet);
+    color: var(--white);
     font-size: 0.75em;
     overflow-y: scroll;
     max-height: 100vh;
 }
 
 .lecturer-container {
-    background: lightblue;
-    color: black;
+    background: var(--jet);
+    color: var(--white);
 }
 
 .fullscreen {
@@ -45,7 +59,7 @@ html {
 }
 
 .lecturer {
-    max-width: 1200px;
+    // max-width: 1200px;
     margin: 2em;
     gap: 0em;
 
@@ -54,16 +68,17 @@ html {
     }
 
     >div:first-child {
-        background: #fff;
+        background: var(--white);
+        color: var(--jet);
         padding: 2em 1em 2em 2em;
         border-radius: 1em 0 0 1em;
     }
 
     .sidebar {
-        background: #222;
+        background: var(--prussian-blue);
+        color: var(--white);
         padding: 2em 2em 2em 1em;
         border-radius: 0 1em 1em 0;
-        color: #eee;
         white-space: nowrap;
     }
 
@@ -71,7 +86,7 @@ html {
         gap: 1em;
     }
 
-    @media screen and (max-width: 1000px) {
+    @media screen and (max-width: 1200px) {
         flex-direction: column;
         gap: 0;
 
@@ -95,7 +110,7 @@ html {
 .info-box {
     padding-left: 1em;
 
-    @media screen and (max-width: 800px) {
+    @media screen and (max-width: 1200px) {
         padding-left: 0;
     }
 }
@@ -136,14 +151,14 @@ html {
         display: inline-block;
         margin: 0.25em 0;
         border-radius: 9000px;
-        background: #9cd;
+        background: var(--sky-blue);
         padding: 0.25em 1em;
-        box-shadow: 0.4em 0.2em 0.2em #0005;
+        box-shadow: 0.2em 0.1em 0.1em #0005;
 
         transition: background-color 0.2s ease;
 
         &:hover {
-            background: #7ab;
+            background: var(--sunglow);
         }
     }
 }
