@@ -6,6 +6,14 @@ import logging
 import sys
 from schemas import *
 import os
+import signal
+
+def signal_handler(sig, frame):
+    print('Shutting down...')
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
