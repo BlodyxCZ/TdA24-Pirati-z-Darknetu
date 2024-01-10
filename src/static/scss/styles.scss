@@ -58,6 +58,18 @@ html {
     flex-direction: column;
 }
 
+.tda-logo-container {
+    width: fit-content;
+    height: fit-content;
+
+    img {
+        padding: 40% 25%;
+        max-width: 100%;
+        max-height: 100%;
+        box-sizing: border-box;
+    }
+}
+
 .lecturer {
     // max-width: 1200px;
     margin: 2em;
@@ -104,6 +116,10 @@ html {
             padding: 1em 2em 2em 2em;
             border-radius: 0 0 1em 1em;
         }
+    }
+    .tda-logo-container {
+        width: 100%;
+        height: auto;
     }
 }
 
@@ -160,14 +176,5 @@ html {
         &:hover {
             background: var(--sunglow);
         }
-    }
-}
-
-.tda-logo-container {
-    width: fit-content;
-    height: fit-content;
-
-    img {
-        margin: 40% 25%;
     }
 }
