@@ -41,6 +41,10 @@ async def js(file):
 
 @app.route("/")
 async def index():
+    return await render_template("lecturers.html")
+
+@app.route("/dev")
+async def dev():
     return await render_template("index.html")
 
 @app.route("/log")
@@ -61,6 +65,7 @@ async def lecturer_page(uuid):
     lecturer = await db.get_lecturer(uuid)
     if lecturer is None:
         return await render_template("404.html"), 404
+    print(lecturer)
     return await render_template("lecturer_template.html", lecturer=lecturer)
 
 @app.errorhandler(404)
