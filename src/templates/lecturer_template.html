@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-        <link rel="stylesheet" href="/css/styles.css">
+        <link rel="stylesheet" href="/css/lecturer.css">
         <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
         <link href="https://fonts.googleapis.com/css?family=Lalezar" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/base-min.css">
@@ -17,22 +17,25 @@
             <div class="center fullscreen lecturer-container">
                 <div class="split-h lecturer">
                     <div class="split-v">
+                        <div class="back">
+                            <a class="l-bg" href="/">Zpět</a>
+                        </div>
                         <div class="split-h">
                             <div class="img-container profile-picture">
                                 <img
                                     src="{{ lecturer['picture_url'] }}" />
                             </div>
                             <div class="split-v info-box">
-                                <div class="name">Mgr. Petra Swil Plachá, MBA</div>
+                                <div class="name">{{ lecturer["title_before"] }} {{ lecturer["first_name"] }} {{ lecturer["middle_name"] }} {{ lecturer["last_name"] }} {{ lecturer["title_after"] }}</div>
                                 <div class="claim">{{ lecturer["claim"] }}</div>
                                 <div class="city">{{ lecturer["location"] }}</div>
                             </div>
                         </div>
                         <div class="bio">
-                            <p>{{ lecturer["bio"] }}</p>
+                            <p>{{ lecturer["bio"] | safe }}</p>
                         </div>
                         <div class="tags">
-                            {% for tag in lecturer["tags"] %}
+                            {% for tag in lecturer["tags"] %}   
                                 <div>{{ tag["name"] }}</div>
                             {% endfor %}
                         </div>
@@ -40,8 +43,8 @@
                     <div class="sidebar split-v">
                         <div>
                             <div>Cena za hodinu: {{ lecturer["price_per_hour"] }} Kč</div>
-                            <div>Tel. číslo: <a href="#">{{ lecturer["contact"]["telephone_numbers"][0] }}</a></div>
-                            <div>Email: <a href="#">{{ lecturer["contact"]["emails"][0] }}</a></div>
+                            <div>Tel. číslo: <a class="d-bg" href="tel:{{ lecturer['contact']['telephone_numbers'][0] }}">{{ lecturer["contact"]["telephone_numbers"][0] }}</a></div>
+                            <div>Email: <a class="d-bg" href="mailto:{{ lecturer['contact']['emails'][0] }}">{{ lecturer["contact"]["emails"][0] }}</a></div>
                         </div>
                         <div class="tda-logo-container">
                             <img src="{{ url_for('static', filename='images/TdA_LOGO/TeacherDigitalAgency_LOGO_colour-white.png') }}" />
