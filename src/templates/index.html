@@ -9,22 +9,47 @@
         <link href="https://fonts.googleapis.com/css?family=Lalezar" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="/css/lecturers.css">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <script type="text/javascript" src="/js/lecturers.js"></script>
         <title>Teacher Digital Agency</title>
     </head>
 
     <body>
-        <main>
-            <div class="filter panel">
-                
+        <main class="fullscreen split-h">
+            <div class="filter-panel-container">
+                <div>
+                    <div>
+                        Placeholder
+                    </div>
+                </div>
             </div>
-            <div class="scroll box">
-                <div class="lecturer cards">
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
+            <div class="scroll">
+                <div class="lecturer-cards" id="lecturers">
+                    <div class="split-v">
+                        <div>
+                            <div class="picture-container">
+                                <img src="https://picsum.photos/200" />
+                            </div>
+                            <div class="name">
+                                Name
+                            </div>
+                            <div class="city">
+                                City
+                            </div>
+                            <div class="claim">
+                                Claim
+                            </div>
+                            <ul class="tags">
+                                <li>Tag</li>
+                                <li>Tag</li>
+                                <li>Tag</li>
+                                <li>Tag</li>
+                                <li>Tag</li>
+                            </ul>
+                        </div>
+                        <div class="price-per-hour">
+                            Price per hour
+                        </div>
+                    </div>
                 </div>
             </div>
 

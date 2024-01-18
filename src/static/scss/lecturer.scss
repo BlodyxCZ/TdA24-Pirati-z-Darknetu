@@ -1,10 +1,5 @@
 @import "styles.scss";
 
-* {
-    margin: 0;
-    padding: 0;
-}
-
 a {
     text-decoration: none;
     transition: color 0.2s ease;
@@ -26,19 +21,6 @@ a {
     }
 }
 
-html {
-    font-size: 22px;
-    font-family: 'Open Sans' !important;
-    font-style: normal;
-}
-
-/* @for $i from 1 through 6 {
-    h#{$i} {
-        font-family: 'Lalezar';
-        font-style: normal;
-    }
-} */
-
 #log {
     background: var(--jet);
     color: var(--white);
@@ -50,27 +32,6 @@ html {
 .lecturer-container {
     background: var(--jet);
     color: var(--white);
-}
-
-.fullscreen {
-    min-width: 100vw;
-    min-height: 100vh;
-}
-
-.center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.split-h {
-    display: flex;
-    flex-direction: row;
-}
-
-.split-v {
-    display: flex;
-    flex-direction: column;
 }
 
 .tda-logo-container {
@@ -132,6 +93,7 @@ html {
             border-radius: 0 0 1em 1em;
         }
     }
+
     .tda-logo-container {
         width: 100%;
         height: auto;

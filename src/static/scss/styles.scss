@@ -5,3 +5,42 @@
     --jet: #333333;
     --sunglow: #fecb2e;
 }
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 22px;
+    font-family: 'Open Sans' !important;
+    font-style: normal;
+}
+
+@for $i from 1 through 6 {
+    h#{$i} {
+        font-family: 'Lalezar';
+        font-style: normal;
+    }
+}
+
+.fullscreen {
+    width: 100vw;
+    height: 100vh;
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.split-h {
+    display: flex;
+    flex-direction: row;
+}
+
+.split-v {
+    display: flex;
+    flex-direction: column;
+}
