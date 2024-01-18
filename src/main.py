@@ -80,6 +80,11 @@ def api():
     return {"secret": "The cake is a lie"}, 200 """
 
 
+@app.route("/api/tags", methods=["GET"])
+async def get_tags():
+    tags = await db.get_all_tags()
+    return tags, 200
+
 @app.route("/api/lecturers", methods=["GET"])
 async def get_lecturers():
     lecturers = await db.get_lecturers()
