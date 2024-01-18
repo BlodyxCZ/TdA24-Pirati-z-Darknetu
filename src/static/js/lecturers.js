@@ -47,9 +47,11 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function getLecturers() {
+    console.log("Fetching lecturer list");
     const response = await fetch("/api/lecturers");
     const data = await response.json();
     window.data_cache = data;
+    console.log(data);
     updateLecturers(data);
 }
 
@@ -61,8 +63,6 @@ function updateLecturers(data) {
     let price_max = parseInt(document.getElementById("price-max").value);
 
     for (let lecturer of data) {
-        console.log(lecturer);
-
         if (lecturer.price_per_hour < price_min ||
             lecturer.price_per_hour > price_max) {
             continue;
