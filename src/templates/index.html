@@ -19,10 +19,21 @@
                 <div>
                     <div>
                         Cenové rozpětí
-                        <div class="slider">
-                            <div class="slider-track"></div>
-                            <input type="range" min="0" max="20000" value="0" id="price-min">
-                            <input type="range" min="0" max="20000" value="20000" id="price-max">
+                        <div class="slider-wrapper">
+                            <div class="values">
+                                <span id="price-min-value">
+                                    0
+                                </span>
+                                <span> &dash; </span>
+                                <span id="price-max-value">
+                                    100000
+                                </span>
+                            </div>
+                            <div class="slider">
+                                <div class="slider-track"></div>
+                                <input type="range" min="0" max="100000" value="0" id="price-min">
+                                <input type="range" min="0" max="100000" value="100000" id="price-max">
+                            </div>
                         </div>
                     </div>
                 </div>

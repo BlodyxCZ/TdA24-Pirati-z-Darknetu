@@ -1,8 +1,13 @@
+var data_cache = null;
+var refresh_timeout = null;
+
 document.addEventListener("DOMContentLoaded", () => {
     getLecturers();
 
     let sliderOne = document.getElementById("price-min");
     let sliderTwo = document.getElementById("price-max");
+    let displayValOne = document.getElementById("price-min-value");
+    let displayValTwo = document.getElementById("price-max-value");
     let minGap = 0;
     let sliderTrack = document.querySelector(".slider-track");
     let sliderMaxValue = document.getElementById("price-min").max;
@@ -10,35 +15,58 @@ document.addEventListener("DOMContentLoaded", () => {
     function fillColor() {
         percent1 = (sliderOne.value / sliderMaxValue) * 100;
         percent2 = (sliderTwo.value / sliderMaxValue) * 100;
-        sliderTrack.style.background = `linear-gradient(to right, #dadae5 ${percent1}% , #3264fe ${percent1}% , #3264fe ${percent2}%, #dadae5 ${percent2}%)`;
+        sliderTrack.style.background = `linear-gradient(to right, var(--white) ${percent1}% , var(--sunglow) ${percent1}% , var(--sunglow) ${percent2}%, var(--white) ${percent2}%)`;
     }
 
     sliderOne.addEventListener("input", (e) => {
         if (parseInt(sliderTwo.value) - parseInt(sliderOne.value) <= minGap) {
             sliderOne.value = parseInt(sliderTwo.value) - minGap;
         }
-        //displayValOne.textContent = sliderOne.value;
+        displayValOne.textContent = sliderOne.value;
         fillColor();
+        updateLecturers(data_cache);
+        clearTimeout(refresh_timeout);
+        refresh_timeout = setTimeout(() => {
+            getLecturers();
+        }, 500);
     });
     sliderTwo.addEventListener("input", (e) => {
         if (parseInt(sliderTwo.value) - parseInt(sliderOne.value) <= minGap) {
             sliderTwo.value = parseInt(sliderOne.value) + minGap;
         }
-        //displayValTwo.textContent = sliderTwo.value;
+        displayValTwo.textContent = sliderTwo.value;
         fillColor();
+        updateLecturers(data_cache);
+        clearTimeout(refresh_timeout);
+        refresh_timeout = setTimeout(() => {
+            getLecturers();
+        }, 500);
     });
+
+    fillColor();
 });
 
 async function getLecturers() {
     const response = await fetch("/api/lecturers");
     const data = await response.json();
+    window.data_cache = data;
     updateLecturers(data);
 }
 
 function updateLecturers(data) {
     const lecturers = document.getElementById("lecturers");
+    lecturers.innerHTML = "";
+
+    let price_min = parseInt(document.getElementById("price-min").value);
+    let price_max = parseInt(document.getElementById("price-max").value);
+
     for (let lecturer of data) {
         console.log(lecturer);
+
+        if (lecturer.price_per_hour < price_min ||
+            lecturer.price_per_hour > price_max) {
+            continue;
+        }
 
         const main_container = document.createElement("div");
         main_container.classList.add("split-v");
