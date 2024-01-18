@@ -79,11 +79,17 @@ def api():
     # Portal reference
     return {"secret": "The cake is a lie"}, 200 """
 
+@app.route("/api/locations", methods=["GET"])
+async def get_locations():
+    locations = await db.get_all_locations()
+    return locations, 200
+
 
 @app.route("/api/tags", methods=["GET"])
 async def get_tags():
     tags = await db.get_all_tags()
     return tags, 200
+
 
 @app.route("/api/lecturers", methods=["GET"])
 async def get_lecturers():

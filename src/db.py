@@ -54,6 +54,12 @@ async def get_lecturer(uuid) -> dict or None:
 
     return lecturer
 
+async def get_all_locations() -> list:
+    await check_db_connection()
+    locations = (await db.query("RETURN array::distinct(SELECT VALUE location FROM lecturers);"))[0]["result"]
+
+    return locations
+
 async def get_all_tags() -> list:
     await check_db_connection()
     tags = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM tags;"))[0]["result"]
