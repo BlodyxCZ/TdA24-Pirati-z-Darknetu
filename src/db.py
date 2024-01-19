@@ -4,10 +4,12 @@ import re
 
 db = Surreal()
 
-def check_db_connection() -> bool:
-    if db.client_state == ws.ConnectionState.CONNECTED:
-        return True
-    return False
+async def check_db_connection() -> None:
+    try:
+        if (await db.query("RETURN true;"))[0]["result"] != True:
+            await init()
+    except:
+        await init()
 
 async def init() -> None:
     try:
@@ -18,12 +20,13 @@ async def init() -> None:
             print("Connecting to database...")
             await db.connect("http://" + os.environ.get("DATABASE_ADDRESS", "130.61.210.43:8000") + "/rpc")
             await db.signin({"user": "root", "pass": password})
-            await db.use("test", "test")
+            await db.use("tda", "tda")
     except FileNotFoundError:
         return
 
 
 async def get_lecturers() -> list:
+    await check_db_connection()
     lecturers = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers;"))[0]["result"]
     
     for lecturer in lecturers:
@@ -35,6 +38,7 @@ async def get_lecturers() -> list:
 
 
 async def get_lecturer(uuid) -> dict or None:
+    await check_db_connection()
     lecturer = (await db.query('SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers WHERE id = type::thing("lecturers", $uuid);', vars= {
         "uuid": uuid
     }))[0]["result"]
@@ -50,7 +54,20 @@ async def get_lecturer(uuid) -> dict or None:
 
     return lecturer
 
+async def get_all_locations() -> list:
+    await check_db_connection()
+    locations = (await db.query("RETURN array::distinct(SELECT VALUE location FROM lecturers);"))[0]["result"]
+
+    return locations
+
+async def get_all_tags() -> list:
+    await check_db_connection()
+    tags = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM tags;"))[0]["result"]
+
+    return tags
+
 async def get_tags(tag_ids: list) -> list:
+    await check_db_connection()
     tags = []
     for tag in tag_ids:
         tags.append((await db.query('SELECT *, meta::id(id) AS uuid OMIT id FROM type::thing($tag_id);', {
@@ -60,6 +77,7 @@ async def get_tags(tag_ids: list) -> list:
     return tags
 
 async def post_lecturer(data) -> dict:
+    await check_db_connection()
     data["bio"] = re.sub(r"<(?!\/?(b|i|u|strong|em)(?=>|\s.*>))\/?.*?>", "", data["bio"]) # remove unallowed HTML tags
     
     if "tags" in data:
@@ -85,6 +103,7 @@ async def post_lecturer(data) -> dict:
 
 
 async def put_lecturer(uuid, data) -> dict or None:
+    await check_db_connection()
     if data == {}:
         return (await db.query('SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers WHERE id = type::thing("lecturers", $uuid);', vars= {
             "uuid": uuid
@@ -115,6 +134,7 @@ async def put_lecturer(uuid, data) -> dict or None:
 
 
 async def delete_lecturer(uuid) -> bool:
+    await check_db_connection()
     result = (await db.query('DELETE type::thing("lecturers", $uuid) RETURN BEFORE;', {
         "uuid": uuid
     }))[0]["result"]

@@ -1,0 +1,40 @@
+@import "styles.scss";
+
+// set background color to --jet
+// set color of the h1 to --sunglow
+// put the content to the center of the page
+
+body {
+    background-color: var(--jet);
+}
+
+html {
+    font-size: 22px;
+    font-family: 'Open Sans';
+    font-style: normal;
+}
+
+a {
+    color: var(--sky-blue);
+    margin: 20px;
+}
+
+.desc {
+    color: var(--white);
+}
+
+.title {
+    color: var(--sunglow);
+    font-family: "Lalezar";
+    font-style: normal;
+    font-size: 110px;
+    letter-spacing: 10px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+}

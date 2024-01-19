@@ -1,26 +1,28 @@
+:root {
+    --prussian-blue: #00384d;
+    --sky-blue: #74c7d3;
+    --white: #ffffff;
+    --jet: #333333;
+    --sunglow: #fecb2e;
+}
+
 * {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 html {
-    font-size: 24px;
-    font-family: 'Times New Roman', Times, serif;
-    background: #222;
-    color: #eee;
+    font-size: 22px;
+    font-family: 'Open Sans' !important;
+    font-style: normal;
 }
 
-#log {
-    background: #111;
-    color: #eee;
-    font-size: 0.75em;
-    overflow-y: scroll;
-    max-height: 100vh;
-}
-
-.lecturer-container {
-    background: lightblue;
-    color: black;
+@for $i from 1 through 6 {
+    h#{$i} {
+        font-family: 'Lalezar';
+        font-style: normal;
+    }
 }
 
 .fullscreen {
@@ -42,108 +44,4 @@ html {
 .split-v {
     display: flex;
     flex-direction: column;
-}
-
-.lecturer {
-    max-width: 1200px;
-    margin: 2em;
-    gap: 0em;
-
-    >div {
-        box-shadow: 1em 0.5em 0.5em #0005;
-    }
-
-    >div:first-child {
-        background: #fff;
-        padding: 2em 1em 2em 2em;
-        border-radius: 1em 0 0 1em;
-    }
-
-    .sidebar {
-        background: #222;
-        padding: 2em 2em 2em 1em;
-        border-radius: 0 1em 1em 0;
-        color: #eee;
-        white-space: nowrap;
-    }
-
-    .split-v {
-        gap: 1em;
-    }
-
-    @media screen and (max-width: 1000px) {
-        flex-direction: column;
-        gap: 0;
-
-        .split-h {
-            flex-direction: column;
-            gap: 1em;
-        }
-
-        >div:first-child {
-            padding: 2em 2em 1em 2em;
-            border-radius: 1em 1em 0 0;
-        }
-
-        .sidebar {
-            padding: 1em 2em 2em 2em;
-            border-radius: 0 0 1em 1em;
-        }
-    }
-}
-
-.info-box {
-    padding-left: 1em;
-
-    @media screen and (max-width: 800px) {
-        padding-left: 0;
-    }
-}
-
-.name {
-    font-size: 2em;
-}
-
-.city {
-    font-size: 1.5em;
-}
-
-.claim {
-    font-size: 1em;
-}
-
-.profile-picture {
-    min-width: fit-content;
-
-    img {
-        border-radius: 1em;
-        overflow: hidden;
-        width: auto;
-        height: auto;
-        box-shadow: 0.5em 0.25em 0.25em #0005;
-    }
-}
-
-.img-container {
-    img {
-        display: block;
-        object-fit: cover;
-    }
-}
-
-.tags {
-    div {
-        display: inline-block;
-        margin: 0.25em 0;
-        border-radius: 9000px;
-        background: #9cd;
-        padding: 0.25em 1em;
-        box-shadow: 0.4em 0.2em 0.2em #0005;
-
-        transition: background-color 0.2s ease;
-
-        &:hover {
-            background: #7ab;
-        }
-    }
 }

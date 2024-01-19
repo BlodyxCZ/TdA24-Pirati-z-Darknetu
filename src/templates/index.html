@@ -4,16 +4,93 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-        <link rel="stylesheet" href="/css/styles.css">
-        <title>Tour de App</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/base-min.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Lalezar" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="/css/lecturers.css">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <script type="text/javascript" src="/js/lecturers.js"></script>
+        <title>Teacher Digital Agency</title>
     </head>
 
     <body>
-        <main>
-            <a href="/log">log</a>
-            <a href="/dbpasswd">dbpasswd</a>
-            <a href="/api/lecturers">lecturers</a>
-            <a href="/lecturer">lecturer</a>
+        <main class="fullscreen split-h">
+            <div class="filter-panel-container">
+                <div>
+                    <div>
+                        Cenové rozpětí
+                        <div class="slider-wrapper">
+                            <div class="values">
+                                <span id="price-min-value">
+                                    0
+                                </span>
+                                <span> &dash; </span>
+                                <span id="price-max-value">
+                                    100000
+                                </span>
+                            </div>
+                            <div class="slider">
+                                <div class="slider-track"></div>
+                                <input type="range" min="0" max="100000" value="0" id="price-min">
+                                <input type="range" min="0" max="100000" value="100000" id="price-max">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        Město:
+                        <input list="location-list" id="location-select">
+                        <datalist id="location-list">
+
+                        </datalist>
+                    </div>
+                    <div>
+                        <div>
+                            Tagy:
+                            <input list="tag-list" id="tag-select">
+                            <datalist id="tag-list">
+
+                            </datalist>
+                        </div>
+                        <div>
+                            Vybrané:
+                            <span class="selected-tags" id="selected-tags">
+
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="scroll">
+                <div class="lecturer-cards" id="lecturers">
+                    <a class="split-v">
+                        <div>
+                            <div class="picture-container">
+                                <img src="https://picsum.photos/200" />
+                            </div>
+                            <div class="name">
+                                Name
+                            </div>
+                            <div class="location">
+                                Location
+                            </div>
+                            <div class="claim">
+                                Claim
+                            </div>
+                            <ul class="tags">
+                                <li>Tag</li>
+                                <li>Tag</li>
+                                <li>Tag</li>
+                                <li>Tag</li>
+                                <li>Tag</li>
+                            </ul>
+                        </div>
+                        <div class="price-per-hour">
+                            Price per hour
+                        </div>
+                    </a>
+                </div>
+            </div>
+
         </main>
     </body>
 

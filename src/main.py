@@ -1,4 +1,4 @@
-from quart import Quart, render_template, request
+from quart import Quart, render_template, request, send_file
 import atexit
 import db as db
 import sass
@@ -6,6 +6,14 @@ import logging
 import sys
 from schemas import *
 import os
+import signal
+
+def signal_handler(sig, frame):
+    print('Shutting down...')
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
@@ -17,10 +25,9 @@ sass.compile(dirname=('static/scss', 'static/css'), output_style='compressed')
 
 # CSS
 
-
-@app.route("/css/styles.css")
-async def css():
-    return await app.send_static_file("css/styles.css")
+@app.route("/css/<file>.css")
+async def css(file):
+    return await app.send_static_file("css/" + file + ".css")
 
 # JS
 
@@ -30,10 +37,13 @@ async def js(file):
 
 # Pages
 
-
 @app.route("/")
 async def index():
     return await render_template("index.html")
+
+@app.route("/dev")
+async def dev():
+    return await render_template("dev.html")
 
 @app.route("/log")
 async def log_page():
@@ -48,13 +58,37 @@ async def lecturer():
 async def update_password():
     return await render_template("dbpasswd.html")
 
-# API
+@app.route("/lecturer/<uuid>", methods=["GET"])
+async def lecturer_page(uuid):
+    lecturer = await db.get_lecturer(uuid)
+    if lecturer is None:
+        return await render_template("404.html"), 404
+    if lecturer["title_after"] != "":
+        lecturer["last_name"] += ","
+    print(lecturer)
+    return await render_template("lecturer_template.html", lecturer=lecturer)
 
+@app.errorhandler(404)
+async def page_not_found(e):
+    return await render_template("404.html"), 404
+
+# API
 
 """ @app.route("/api")
 def api():
     # Portal reference
     return {"secret": "The cake is a lie"}, 200 """
+
+@app.route("/api/locations", methods=["GET"])
+async def get_locations():
+    locations = await db.get_all_locations()
+    return locations, 200
+
+
+@app.route("/api/tags", methods=["GET"])
+async def get_tags():
+    tags = await db.get_all_tags()
+    return tags, 200
 
 
 @app.route("/api/lecturers", methods=["GET"])
@@ -98,11 +132,10 @@ async def delete_lecturer(uuid):
 
 # Server utilities
 
-
-@app.before_request
+""" @app.before_request
 async def check_db_connection_before_request():
     if not db.check_db_connection():
-        await db.init()
+        await db.init() """
 
 
 @app.route("/api/conn")
