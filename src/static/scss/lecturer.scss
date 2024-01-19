@@ -74,6 +74,13 @@ a {
         gap: 1em;
     }
 
+
+    .tda-logo-container {
+        width: 100%;
+        height: auto;
+    }
+
+
     @media screen and (max-width: 1200px) {
         flex-direction: column;
         gap: 0;
@@ -92,11 +99,14 @@ a {
             padding: 1em 2em 2em 2em;
             border-radius: 0 0 1em 1em;
         }
-    }
 
-    .tda-logo-container {
-        width: 100%;
-        height: auto;
+        .tda-logo-container {
+            height: 10em;
+
+            >img {
+                padding: 2em 1em;
+            }
+        }
     }
 }
 
