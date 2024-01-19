@@ -36,11 +36,33 @@
                             </div>
                         </div>
                     </div>
+                    <div>
+                        Město:
+                        <input list="location-list" id="location-select">
+                        <datalist id="location-list">
+
+                        </datalist>
+                    </div>
+                    <div>
+                        <div>
+                            Tagy:
+                            <input list="tag-list" id="tag-select">
+                            <datalist id="tag-list">
+
+                            </datalist>
+                        </div>
+                        <div>
+                            Vybrané:
+                            <span class="selected-tags" id="selected-tags">
+
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="scroll">
                 <div class="lecturer-cards" id="lecturers">
-                    <div class="split-v">
+                    <a class="split-v">
                         <div>
                             <div class="picture-container">
                                 <img src="https://picsum.photos/200" />
@@ -48,8 +70,8 @@
                             <div class="name">
                                 Name
                             </div>
-                            <div class="city">
-                                City
+                            <div class="location">
+                                Location
                             </div>
                             <div class="claim">
                                 Claim
@@ -65,7 +87,7 @@
                         <div class="price-per-hour">
                             Price per hour
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
 
