@@ -195,7 +195,26 @@ function check_filter(lecturer) {
 
 function getName(lecturer) {
     // Good enough
-    return `${lecturer.title_after}${lecturer.title_after != "" ? " " : ""}${lecturer.first_name}${lecturer.middle_name != "" ? " " : ""}${lecturer.middle_name} ${lecturer.last_name}${lecturer.title_before != "" ? " " : ""}${lecturer.title_before}`;
+    if (lecturer.title_before == null) {
+        lecturer.title_before = "";
+    } else {
+        lecturer.title_before += " ";
+    }
+
+    if (lecturer.middle_name == null) {
+        lecturer.middle_name = " ";
+    } else {
+        lecturer.middle_name += " ";
+        lecturer.first_name += " ";
+    }
+
+    if (lecturer.title_after == null) {
+        lecturer.title_after = "";
+    } else {
+        lecturer.last_name += ", ";
+    }
+
+    return `${lecturer.title_before}${lecturer.first_name}${lecturer.middle_name}${lecturer.last_name}${lecturer.title_after}`;
 }
 
 function getLocations() {

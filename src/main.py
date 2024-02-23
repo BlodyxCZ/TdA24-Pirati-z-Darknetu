@@ -63,8 +63,14 @@ async def lecturer_page(uuid):
     lecturer = await db.get_lecturer(uuid)
     if lecturer is None:
         return await render_template("404.html"), 404
-    if lecturer["title_after"] != "":
+    if lecturer["title_after"] != "" and lecturer["title_after"] != None:
         lecturer["last_name"] += ","
+    if lecturer["middle_name"] == None:
+        lecturer["middle_name"] = ""
+    if lecturer["title_before"] == None:
+        lecturer["title_before"] = ""
+    if lecturer["title_after"] == None:
+        lecturer["title_after"] = ""
     print(lecturer)
     return await render_template("lecturer_template.html", lecturer=lecturer)
 
