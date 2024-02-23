@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/base-min.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Lalezar" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="/css/reservations.css">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <script type="text/javascript" src="/js/reservations.js"></script>
+        <script type="text/javascript">
+            const uuid = "{{ lecturer['uuid'] }}";
+        </script>
+        <title>Teacher Digital Agency</title>
+    </head>
+
+    <body>
+        <main class="fullscreen split-h">
+            <div class="date-picker">
+                <div>
+                    <input type="date">
+                </div>
+            </div>
+            <div class="timetable">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="hour-column">
+
+                            </th>
+                            <th class="minute-column">
+                                00 30 59
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in range(23) %}
+                        <tr>
+                            <td>
+                                {{ i }}:00
+                            </td>
+                            <td>
+
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </body>
+
+</html>

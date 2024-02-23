@@ -74,6 +74,13 @@ async def lecturer_page(uuid):
     print(lecturer)
     return await render_template("lecturer_template.html", lecturer=lecturer)
 
+@app.route("/lecturer/<uuid>/reservations", methods=["GET"])
+async def lecturer_reservations(uuid):
+    lecturer = await db.get_lecturer(uuid)
+    if lecturer is None:
+        return await render_template("404.html"), 404
+    return await render_template("reservations.html", lecturer=lecturer)
+
 @app.errorhandler(404)
 async def page_not_found(e):
     return await render_template("404.html"), 404

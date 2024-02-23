@@ -1,0 +1,45 @@
+@import "styles.scss";
+
+main {
+    background: var(--jet);
+
+    .date-picker>div {
+        border-radius: 0.5em;
+        border: solid var(--white);
+        padding: 1em;
+    }
+
+    >div {
+        margin: 2em;
+    }
+}
+
+.timetable {
+    flex-grow: 1;
+    overflow-y: scroll;
+
+    >table {
+        width: 100%;
+        border-spacing: 0.5em;
+        border-collapse: separate;
+
+        th {
+            color: var(--white);
+            vertical-align: bottom;
+        }
+
+        td {
+            color: var(--white);
+            border: solid var(--white);
+            border-radius: 0.5em;
+            padding: 1em;
+            text-align: center;
+        }
+    }
+}
+
+.hour-column {
+    width: 4em;
+}
+
+.minute-column {}
