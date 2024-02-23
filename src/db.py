@@ -1,6 +1,7 @@
 from surrealdb import Surreal, ws
 import os
 import re
+import bcrypt
 
 db = Surreal()
 
@@ -91,6 +92,8 @@ async def post_lecturer(data) -> dict:
     else:
         data["tags"] = []
     
+    data["password"] = bcrypt.hashpw(data["password"], bcrypt.gensalt()).decode()
+
     lecturer = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id, tags FROM (CREATE lecturers:uuid() CONTENT $data);", vars={
         "data": data
     }))[0]["result"][0]
@@ -101,6 +104,27 @@ async def post_lecturer(data) -> dict:
     
     return lecturer
 
+
+async def login(data: dict) -> dict:
+    await check_db_connection()
+    
+    lecturer = (await db.query("SELECT password, id FROM lecturers WHERE contact.emails[0] = $email;", vars={
+        "email": data["email"]
+    }))[0]["result"]
+
+    if len(lecturer) == 0:
+        return {"code": 401, "message": "Invalid email"}
+
+    password_salted = lecturer[0]["password"]
+
+    if not bcrypt.checkpw(data["password"].encode(), password_salted.encode()) :
+        return {"code": 401, "message": "Invalid password"}
+
+    token = (await db.query("CREATE logins CONTENT {lecturer: $lecturer, token: rand::uuid::v7()} RETURN token;", vars={
+        "lecturer": lecturer[0]["id"],
+    }))[0]["result"][0]["token"]
+
+    return {"code": 200, "message": "Logged in", "token": token}
 
 async def put_lecturer(uuid, data) -> dict or None:
     await check_db_connection()

@@ -98,6 +98,13 @@ async def get_locations():
     return locations, 200
 
 
+@app.route("/api/login", methods=["POST"])
+async def login():
+    data = await request.get_json()
+
+    response = await db.login(data)
+    return response, 200
+
 @app.route("/api/tags", methods=["GET"])
 async def get_tags():
     tags = await db.get_all_tags()
