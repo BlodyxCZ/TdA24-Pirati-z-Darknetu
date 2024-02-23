@@ -4,3 +4,4 @@ libsass
 pytest
 pytest-depends
 requests
+bcrypt
