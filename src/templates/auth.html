@@ -12,8 +12,16 @@
     <body>
         <main>
             <form method="post" action="/api/dbpasswd">
+                <label for="password">DB Password</label>
                 <input type="text" name="password">
-                <input type="submit" value="Update">
+                <input type="submit" value="Update DB password">
+            </form>
+            <form method="post" action="/api/basicauth">
+                <label for="username">Username</label>
+                <input type="text" name="username">
+                <label for="password">Password</label>
+                <input type="text" name="password">
+                <input type="submit" value="Update Basic Auth">
             </form>
         </main>
     </body>

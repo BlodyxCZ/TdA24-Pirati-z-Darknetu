@@ -108,19 +108,19 @@ async def post_lecturer(data) -> dict:
 async def login(data: dict) -> dict:
     await check_db_connection()
     
-    lecturer = (await db.query("SELECT password, id FROM lecturers WHERE contact.emails[0] = $email;", vars={
-        "email": data["email"]
+    lecturer = (await db.query("SELECT password, id FROM lecturers WHERE username = $username;", vars={
+        "username": data["username"]
     }))[0]["result"]
 
     if len(lecturer) == 0:
-        return {"code": 401, "message": "Invalid email"}
+        return {"code": 401, "message": "Invalid username"}
 
     password_salted = lecturer[0]["password"]
 
     if not bcrypt.checkpw(data["password"].encode(), password_salted.encode()) :
         return {"code": 401, "message": "Invalid password"}
 
-    token = (await db.query("CREATE logins CONTENT {lecturer: $lecturer, token: rand::uuid::v7()} RETURN token;", vars={
+    token = (await db.query("CREATE logins CONTENT {lecturer: $lecturer, token: rand::uuid::v7(), datetime: time::now()} RETURN token;", vars={
         "lecturer": lecturer[0]["id"],
     }))[0]["result"][0]["token"]
 
