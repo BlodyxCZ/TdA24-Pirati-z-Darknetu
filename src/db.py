@@ -92,7 +92,7 @@ async def post_lecturer(data) -> dict:
     else:
         data["tags"] = []
     
-    data["password"] = bcrypt.hashpw(data["password"], bcrypt.gensalt()).decode()
+    data["password"] = bcrypt.hashpw(bytes(data["password"], "utf-8"), bcrypt.gensalt()).decode()
 
     lecturer = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id, tags FROM (CREATE lecturers:uuid() CONTENT $data);", vars={
         "data": data
@@ -120,9 +120,9 @@ async def login(data: dict) -> dict:
     if not bcrypt.checkpw(data["password"].encode(), password_salted.encode()) :
         return {"code": 401, "message": "Invalid password"}
 
-    token = (await db.query("CREATE logins CONTENT {lecturer: $lecturer, token: rand::uuid::v7(), datetime: time::now()} RETURN token;", vars={
+    token = (await db.query("CREATE logins CONTENT {lecturer: $lecturer, session_token: rand::uuid::v7(), datetime: time::now()} RETURN session_token;", vars={
         "lecturer": lecturer[0]["id"],
-    }))[0]["result"][0]["token"]
+    }))[0]["result"][0]["session_token"]
 
     return {"code": 200, "message": "Logged in", "token": token}
 
