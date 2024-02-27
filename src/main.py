@@ -175,7 +175,7 @@ async def delete_lecturer(uuid):
 async def get_reservations(uuid):
     # Returns full reservation data if token is the lecturer's (token is taken from the Bearer token)
     token = request.headers.get("Authorization")
-    
+
     if token != None:
         token = token.split(" ")[1]
 
@@ -192,6 +192,25 @@ async def get_reservations(uuid):
     if reservations is None:
         return {"code": 404, "message": "Lecturer not found"}, 404
     return reservations, 200
+
+
+@app.route("/api/reservations/<uuid>/icalendar", methods=["GET"])
+async def get_reservations_icalendar(uuid):
+    token = request.headers.get("Authorization")
+    if token != None:
+        token = token.split(" ")[1]
+
+        lecturer_uuid = await db.get_lecturer_uuid_from_token(token)
+
+        if lecturer_uuid is None:
+            return {"code": 401, "message": "Invalid token"}, 401
+        
+        if lecturer_uuid == uuid:
+            reservations = await db.get_reservations(uuid, True)
+
+        return utils.icalendar.generate_icalendar(reservations), 200
+    else:
+        return {"code": 401, "message": "Invalid token"}, 401
 
 
 @app.route("/api/reservations/<uuid>", methods=["POST"])

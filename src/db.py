@@ -28,7 +28,7 @@ async def init() -> None:
 
 async def get_lecturers() -> list:
     await check_db_connection()
-    lecturers = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM lecturers;"))[0]["result"]
+    lecturers = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id, username, password FROM lecturers;"))[0]["result"]
     
     for lecturer in lecturers:
         lecturer["tags"] = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id FROM $tags", {
