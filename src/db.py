@@ -216,6 +216,17 @@ async def get_lecturer_uuid_from_token(token) -> str or None:
     return None if uuid == [] else uuid[0]
 
 
+async def delete_reservation(lecturer_uuid, reservation_uuid) -> bool:
+    await check_db_connection()
+
+    success = (await db.query('DELETE type::thing("reservations", $reservation_uuid) WHERE lecturer = type::thing("lecturers", $lecturer_uuid) RETURN BEFORE;', vars={
+        "reservation_uuid": reservation_uuid,
+        "lecturer_uuid": lecturer_uuid
+    }))[0]["result"]
+
+    return success != []
+
+
 async def close() -> None:
     await db.close()
 

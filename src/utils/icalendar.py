@@ -4,7 +4,6 @@ from datetime import datetime
 
 def generate_icalendar(events: list):
     cal = Calendar()
-    # TODO: Change this
     cal.add('prodid', '-//Teacher digital Agency//Katalog lektorů//cs-CZ')
     cal.add('version', '2.0')
 

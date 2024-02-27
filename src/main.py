@@ -222,6 +222,12 @@ async def post_reservation(uuid):
     data["uuid"] = uuid
 
     response = await db.post_reservation(data)
+
+    try:
+        utils.email.send_new_reservation_email(data["student_email"])
+    except:
+        pass
+
     return response, 201
 
 
@@ -239,6 +245,23 @@ async def confirm_reservation():
 
     if reservation:
         return {"code": 200, "message": "Reservation confirmed"}, 200
+    return {"code": 404, "message": "Reservation not found"}, 404
+
+
+@app.route("/api/reservations/", methods=["DELETE"])
+@basic_auth_required()
+async def delete_reservation():
+    data = await request.get_json()
+
+    lecturer_uuid = await db.get_lecturer_uuid_from_token(data["token"])
+
+    if lecturer_uuid is None:
+        return {"code": 401, "message": "Invalid token"}, 401
+
+    reservation = await db.delete_reservation(lecturer_uuid, data["reservation"])
+
+    if reservation:
+        return {"code": 200, "message": "Reservation deleted"}, 200
     return {"code": 404, "message": "Reservation not found"}, 404
 
 
@@ -269,6 +292,15 @@ async def post_update_dbpassword():
 
     await db.init()
     return "Updated database password", 200
+
+
+@app.route("/api/emailpasswd", methods=["POST"])
+async def post_update_emailpassword():
+    with open("email_password.txt", "w+") as file:
+        file.write((await request.form)["password"])
+
+    utils.email.update_password()
+    return "Updated email password", 200
 
 
 @app.route("/api/basicauth", methods=["POST"])
