@@ -166,11 +166,17 @@ async def delete_lecturer(uuid) -> bool:
     return result[0] != None
 
 
-async def get_reservations(uuid) -> list or None:
+async def get_reservations(uuid, full) -> list or None:
     await check_db_connection()
-    result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT * OMIT id, lecturer, confirmed, info, student_email FROM reservations WHERE lecturer = type::thing("lecturers", $uuid)) END;', {
-        "uuid": uuid
-    }))[0]["result"]
+
+    if full:
+        result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT * OMIT id, lecturer FROM reservations WHERE lecturer = type::thing("lecturers", $uuid)) END;', {
+            "uuid": uuid
+        }))[0]["result"]
+    else:
+        result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT * OMIT id, lecturer, confirmed, info, student_email FROM reservations WHERE lecturer = type::thing("lecturers", $uuid)) END;', {
+            "uuid": uuid
+        }))[0]["result"]
 
     return result
 
@@ -187,6 +193,27 @@ async def post_reservation(data) -> dict:
     }))[0]["result"][0]
 
     return reservation
+
+
+async def confirm_reservation(lecturer_uuid, reservation_uuid) -> bool:
+    await check_db_connection()
+
+    success = (await db.query('UPDATE reservations SET confirmed = true WHERE id = type::thing("reservations", $reservation_uuid) AND lecturer = type::thing("lecturers", $lecturer_uuid);', vars={
+        "reservation_uuid": reservation_uuid,
+        "lecturer_uuid": lecturer_uuid
+    }))[0]["result"]
+
+    return success != []
+
+
+async def get_lecturer_uuid_from_token(token) -> str or None:
+    await check_db_connection()
+    
+    uuid = (await db.query('SELECT VALUE meta::id(lecturer) FROM logins WHERE session_token = $session_token;', vars={
+        "session_token": token
+    }))[0]["result"]
+
+    return None if uuid == [] else uuid[0]
 
 
 async def close() -> None:

@@ -173,7 +173,22 @@ async def delete_lecturer(uuid):
 
 @app.route("/api/reservations/<uuid>", methods=["GET"])
 async def get_reservations(uuid):
-    reservations = await db.get_reservations(uuid)
+    # Returns full reservation data if token is the lecturer's (token is taken from the Bearer token)
+    token = request.headers.get("Authorization")
+    
+    if token != None:
+        token = token.split(" ")[1]
+
+        lecturer_uuid = await db.get_lecturer_uuid_from_token(token)
+
+        if lecturer_uuid is None:
+            return {"code": 401, "message": "Invalid token"}, 401
+        
+        if lecturer_uuid == uuid:
+            reservations = await db.get_reservations(uuid, True)
+    else:
+        reservations = await db.get_reservations(uuid, False)
+
     if reservations is None:
         return {"code": 404, "message": "Lecturer not found"}, 404
     return reservations, 200
@@ -189,6 +204,23 @@ async def post_reservation(uuid):
 
     response = await db.post_reservation(data)
     return response, 201
+
+
+@app.route("/api/reservations/confirm", methods=["PUT"])
+@basic_auth_required()
+async def confirm_reservation():
+    data = await request.get_json()
+
+    lecturer_uuid = await db.get_lecturer_uuid_from_token(data["token"])
+
+    if lecturer_uuid is None:
+        return {"code": 401, "message": "Invalid token"}, 401
+
+    reservation = await db.confirm_reservation(lecturer_uuid, data["reservation"])
+
+    if reservation:
+        return {"code": 200, "message": "Reservation confirmed"}, 200
+    return {"code": 404, "message": "Reservation not found"}, 404
 
 
 # Server utilities
