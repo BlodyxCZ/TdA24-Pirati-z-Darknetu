@@ -28,7 +28,8 @@ QuartAuth(app)
 
 @app.before_request
 async def log_request():
-    logging.info(f"Request: {request.method} {request.path} from {request.remote_addr}")
+    # Totally not a security risk nuh uh :3
+    logging.info(f"Request: {request.method} {request.path} from {request.remote_addr} with data {request.headers}; {await request.get_data()}; {await request.get_json()}")
 
 # SCSS
 
