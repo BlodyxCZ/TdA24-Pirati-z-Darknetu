@@ -7,6 +7,9 @@ services:
     restart: always
     environment:
       - DATABASE_ADDRESS=130.61.210.43:8000
+      - EMAIL_ADDRESS=noreply@ondradoksy.com
+      - EMAIL_PORT=25
+      - EMAIL_SERVER=ondradoksy.com
     develop:
       watch:
         - action: rebuild

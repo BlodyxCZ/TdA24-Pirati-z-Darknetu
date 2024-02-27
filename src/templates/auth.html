@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/base-min.css">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <title>Tour de App</title>
+    </head>
+
+    <body>
+        <main>
+            <form method="post" action="/api/dbpasswd">
+                <label for="password">DB Password</label>
+                <input type="text" name="password">
+                <input type="submit" value="Update DB password">
+            </form>
+            <form method="post" action="/api/basicauth">
+                <label for="username">Username</label>
+                <input type="text" name="username">
+                <label for="password">Password</label>
+                <input type="text" name="password">
+                <input type="submit" value="Update Basic Auth">
+            </form>
+            <form method="post" action="/api/emailpasswd">
+                <label for="password">Email Password</label>
+                <input type="text" name="password">
+                <input type="submit" value="Update Email password">
+            </form>
+        </main>
+    </body>
+
+</html>

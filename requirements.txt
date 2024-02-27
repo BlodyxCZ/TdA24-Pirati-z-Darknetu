@@ -4,3 +4,6 @@ libsass
 pytest
 pytest-depends
 requests
+bcrypt
+quart-auth
+icalendar
