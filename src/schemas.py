@@ -11,6 +11,8 @@ lecturer_schema = {
     "price_per_hour": {"type": int, "required": False},
     "contact": {"type": dict, "required": False},
     "tags": {"type": list, "required": False},
+    "username": {"type": str, "required": True},
+    "password": {"type": str, "required": True},
 }
 
 
