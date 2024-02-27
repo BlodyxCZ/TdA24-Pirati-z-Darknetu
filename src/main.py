@@ -8,6 +8,7 @@ import sys
 from schemas import *
 import os
 import signal
+import utils.email, utils.icalendar
 
 def signal_handler(sig, frame):
     print('Shutting down...')
@@ -168,6 +169,27 @@ async def delete_lecturer(uuid):
     if success:
         return {"code": 204, "message": "User deleted"}, 204
     return {"code": 404, "message": "User not found"}, 404
+
+
+@app.route("/api/reservations/<uuid>", methods=["GET"])
+async def get_reservations(uuid):
+    reservations = await db.get_reservations(uuid)
+    if reservations is None:
+        return {"code": 404, "message": "Lecturer not found"}, 404
+    return reservations, 200
+
+
+@app.route("/api/reservations/<uuid>", methods=["POST"])
+async def post_reservation(uuid):
+    data = await request.get_json()
+
+    # TODO: Check if date is available
+
+    data["uuid"] = uuid
+
+    response = await db.post_reservation(data)
+    return response, 201
+
 
 # Server utilities
 

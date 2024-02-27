@@ -166,6 +166,29 @@ async def delete_lecturer(uuid) -> bool:
     return result[0] != None
 
 
+async def get_reservations(uuid) -> list or None:
+    await check_db_connection()
+    result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT * OMIT id, lecturer, confirmed, info, student_email FROM reservations WHERE lecturer = type::thing("lecturers", $uuid)) END;', {
+        "uuid": uuid
+    }))[0]["result"]
+
+    return result
+
+
+async def post_reservation(data) -> dict:
+    await check_db_connection()
+
+    reservation = (await db.query('SELECT * OMIT id, lecturer, confirmed FROM (CREATE reservations:uuid() CONTENT {"lecturer": type::thing("lecturers", $uuid), "start_date": $start_date, "end_date": $end_date, "student_email": $student_email, "info": $info, "confirmed": false});', vars={
+        "uuid": data["uuid"],
+        "start_date": data["start_date"],
+        "end_date": data["end_date"],
+        "student_email": data["student_email"],
+        "info": data["info"]
+    }))[0]["result"][0]
+
+    return reservation
+
+
 async def close() -> None:
     await db.close()
 
