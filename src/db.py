@@ -200,7 +200,7 @@ async def get_reservations(uuid, full) -> list or None:
             "uuid": uuid
         }))[0]["result"]
     else:
-        result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT * OMIT id, lecturer, confirmed, info, student_email FROM reservations WHERE lecturer = type::thing("lecturers", $uuid)) END;', {
+        result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT * OMIT id, lecturer, confirmed, info, student FROM reservations WHERE lecturer = type::thing("lecturers", $uuid)) END;', {
             "uuid": uuid
         }))[0]["result"]
 
@@ -210,12 +210,13 @@ async def get_reservations(uuid, full) -> list or None:
 async def post_reservation(data) -> dict:
     await check_db_connection()
 
-    reservation = (await db.query('SELECT * OMIT id, lecturer, confirmed FROM (CREATE reservations:uuid() CONTENT {"lecturer": type::thing("lecturers", $uuid), "start_date": $start_date, "end_date": $end_date, "student_email": $student_email, "info": $info, "confirmed": false});', vars={
+    reservation = (await db.query('SELECT *, meta::id(tag) AS tag OMIT id, lecturer, confirmed FROM (CREATE reservations:uuid() CONTENT {"lecturer": type::thing("lecturers", $uuid), "tag": type::thing("tags", $tag), "start_date": $start_date, "end_date": $end_date, "student": $student, "info": $info, "confirmed": false});', vars={
         "uuid": data["uuid"],
         "start_date": data["start_date"],
         "end_date": data["end_date"],
-        "student_email": data["student_email"],
-        "info": data["info"]
+        "info": data["info"],
+        "tag": data["tag"],
+        "student": data["student"]
     }))[0]["result"][0]
 
     return reservation
