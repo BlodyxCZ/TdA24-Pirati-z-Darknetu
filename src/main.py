@@ -72,6 +72,10 @@ async def lecturer():
 async def update_password():
     return await render_template("auth.html")
 
+@app.route("/login")
+async def login_page():
+    return await render_template("login.html")
+
 
 @app.route("/lecturer/<uuid>", methods=["GET"])
 async def lecturer_page(uuid):
