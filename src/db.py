@@ -196,11 +196,11 @@ async def get_reservations(uuid, full) -> list or None:
     await check_db_connection()
 
     if full:
-        result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT * OMIT id, lecturer FROM reservations WHERE lecturer = type::thing("lecturers", $uuid)) END;', {
+        result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT *, meta::id(tag) AS tag, meta::id(id) AS uuid OMIT id, lecturer FROM reservations WHERE lecturer = type::thing("lecturers", $uuid)) END;', {
             "uuid": uuid
         }))[0]["result"]
     else:
-        result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT * OMIT id, lecturer, confirmed, info, student FROM reservations WHERE lecturer = type::thing("lecturers", $uuid)) END;', {
+        result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT * OMIT id, lecturer, tag, confirmed, info, student FROM reservations WHERE lecturer = type::thing("lecturers", $uuid)) END;', {
             "uuid": uuid
         }))[0]["result"]
 
@@ -248,6 +248,39 @@ async def delete_reservation(lecturer_uuid, reservation_uuid) -> bool:
 
     success = (await db.query('DELETE type::thing("reservations", $reservation_uuid) WHERE lecturer = type::thing("lecturers", $lecturer_uuid) RETURN BEFORE;', vars={
         "reservation_uuid": reservation_uuid,
+        "lecturer_uuid": lecturer_uuid
+    }))[0]["result"]
+
+    return success != []
+
+
+async def post_free_time(lecturer_uuid, data) -> dict or None:
+    await check_db_connection()
+
+    free_time = (await db.query('SELECT *, meta::id(id) AS uuid, meta::id(lecturer) AS lecturer OMIT id FROM (CREATE free_times:uuid() CONTENT {lecturer: type::thing("lecturers", $uuid), start_date: $start_date, end_date: $end_date});', vars={
+        "uuid": lecturer_uuid,
+        "start_date": data["start_date"],
+        "end_date": data["end_date"]
+    }))[0]["result"]
+
+    return free_time
+
+
+async def get_free_times(lecturer_uuid) -> list:
+    await check_db_connection()
+
+    free_times = (await db.query('SELECT *, meta::id(id) AS uuid, meta::id(lecturer) AS lecturer OMIT id FROM free_times WHERE lecturer = type::thing("lecturers", $uuid);', vars={
+        "uuid": lecturer_uuid
+    }))[0]["result"]
+
+    return free_times
+
+
+async def delete_free_time(lecturer_uuid, free_time_uuid) -> bool:
+    await check_db_connection()
+
+    success = (await db.query('DELETE type::thing("free_times", $free_time_uuid) WHERE lecturer = type::thing("lecturers", $lecturer_uuid) RETURN BEFORE;', vars={
+        "free_time_uuid": free_time_uuid,
         "lecturer_uuid": lecturer_uuid
     }))[0]["result"]
 

@@ -211,7 +211,22 @@ async def get_reservations(uuid):
 
     if reservations is None:
         return {"code": 404, "message": "Lecturer not found"}, 404
-    return reservations, 200
+    
+    logging.info(f"Reservations: {reservations}")
+
+    blocks = []
+
+    for reservation in reservations:
+        reservation["type"] = "reservation"
+        blocks.append(reservation)
+
+    free_times = await db.get_free_times(uuid)
+
+    for free_time in free_times:
+        free_time["type"] = "free_time"
+        blocks.append(free_time)
+
+    return blocks, 200
 
 
 @app.route("/api/reservations/<uuid>/icalendar", methods=["GET"])
@@ -352,6 +367,47 @@ async def post_update_basicauth():
     app.config["QUART_AUTH_BASIC_PASSWORD"] = (await request.form)["password"]    
     return "Basic Auth updated", 200
 
+
+@app.route("/api/free-times/<uuid>", methods=["POST"])
+async def get_free_times(uuid):
+    # UUID is the lecturer's UUID
+    data = await request.get_json()
+
+    lecturer_uuid = await db.get_lecturer_uuid_from_token(data["token"])
+
+    if lecturer_uuid is None:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    if lecturer_uuid != uuid:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    # TODO: Check if date is available
+
+    free_time = await db.post_free_time(uuid, data)
+
+    if free_time is None:
+        return "SOME ERROR", 400
+    return free_time[0], 201
+
+
+@app.route("/api/free-times/<uuid>", methods=["DELETE"])
+async def delete_free_time(uuid):
+    # UUID is the lecturer's UUID
+    data = await request.get_json()
+
+    lecturer_uuid = await db.get_lecturer_uuid_from_token(data["token"])
+
+    if lecturer_uuid is None:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    if lecturer_uuid != uuid:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    success = await db.delete_free_time(uuid, data["uuid"])
+
+    if success:
+        return {"code": 200, "message": "Free time deleted"}, 200
+    return {"code": 404, "message": "Free time not found"}, 404
 
 async def exit_handler() -> None:
     print("Closing database connection...")
