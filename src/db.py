@@ -108,7 +108,7 @@ async def post_lecturer(data) -> dict:
 async def login(data: dict) -> dict:
     await check_db_connection()
     
-    lecturer = (await db.query("SELECT password, id FROM lecturers WHERE username = $username;", vars={
+    lecturer = (await db.query("SELECT password, meta::id(id) AS uuid FROM lecturers WHERE username = $username;", vars={
         "username": data["username"]
     }))[0]["result"]
 
@@ -117,14 +117,14 @@ async def login(data: dict) -> dict:
 
     password_salted = lecturer[0]["password"]
 
-    if not bcrypt.checkpw(data["password"].encode(), password_salted.encode()) :
+    if not bcrypt.checkpw(data["password"].encode(), password_salted.encode()):
         return {"code": 401, "message": "Invalid password"}
 
-    token = (await db.query("CREATE logins CONTENT {lecturer: $lecturer, session_token: rand::uuid::v7(), datetime: time::now()} RETURN session_token;", vars={
-        "lecturer": lecturer[0]["id"],
+    token = (await db.query("CREATE logins CONTENT {lecturer: type::thing('lecturers', $lecturer), session_token: rand::uuid::v7(), datetime: time::now()} RETURN session_token;", vars={
+        "lecturer": lecturer[0]["uuid"],
     }))[0]["result"][0]["session_token"]
 
-    return {"code": 200, "message": "Logged in", "token": token}
+    return {"code": 200, "message": "Logged in", "token": token, "uuid": lecturer[0]["uuid"]}
 
 
 async def change_password(uuid, old_password, new_password) -> bool:

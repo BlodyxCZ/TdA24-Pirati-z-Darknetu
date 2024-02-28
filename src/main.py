@@ -73,6 +73,20 @@ async def lecturer():
 async def update_password():
     return await render_template("auth.html")
 
+
+@app.route("/profile/<uuid>", methods=["GET"])
+async def profile(uuid):
+    lecturer = await db.get_lecturer(uuid)
+    if lecturer is None:
+        return await render_template("404.html"), 404
+    return await render_template("profile.html", lecturer=lecturer)
+
+
+@app.route("/reservations/<uuid>", methods=["GET"])
+async def reservations():
+    return await render_template("reservations.html")
+
+
 @app.route("/login")
 async def login_page():
     return await render_template("login.html")
