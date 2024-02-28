@@ -36,13 +36,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for i in range(23) %}
+                        {% for i in range(24) %}
                         <tr>
                             <td>
                                 {{ i }}:00
                             </td>
                             <td>
+                                <div id="hour-{{ i }}" class="hour-flex">
 
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
