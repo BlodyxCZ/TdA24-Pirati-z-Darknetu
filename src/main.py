@@ -241,10 +241,15 @@ async def post_reservation(uuid):
 
     data["uuid"] = uuid
 
+    tags = await db.get_all_tags()
+
+    if data["tag"] not in [tag["uuid"] for tag in tags]:
+        return {"code": 400, "message": "Invalid tag"}, 400
+
     response = await db.post_reservation(data)
 
     try:
-        utils.email.send_new_reservation_email(data["student_email"])
+        utils.email.send_new_reservation_email(data["student"]["email"])
     except:
         pass
 
@@ -252,7 +257,6 @@ async def post_reservation(uuid):
 
 
 @app.route("/api/reservations/confirm", methods=["PUT"])
-@basic_auth_required()
 async def confirm_reservation():
     data = await request.get_json()
 
@@ -269,7 +273,6 @@ async def confirm_reservation():
 
 
 @app.route("/api/reservations/", methods=["DELETE"])
-@basic_auth_required()
 async def delete_reservation():
     data = await request.get_json()
 
