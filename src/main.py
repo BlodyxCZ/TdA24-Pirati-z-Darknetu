@@ -83,8 +83,8 @@ async def profile(uuid):
 
 
 @app.route("/reservations/<uuid>", methods=["GET"])
-async def reservations():
-    return await render_template("reservations.html")
+async def reservations(uuid):
+    return await render_template("reservations.html", uuid=uuid)
 
 
 @app.route("/login")
