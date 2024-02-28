@@ -29,7 +29,8 @@ QuartAuth(app)
 @app.before_request
 async def log_request():
     # Totally not a security risk nuh uh :3
-    logging.info(f"Request: {request.method} {request.path} from {request.remote_addr} with data {request.headers}; {await request.get_data()}; {await request.get_json()}")
+    if not (request.path.startswith("/api/dbpasswd") or request.path.startswith("/api/emailpasswd") or request.path.startswith("/api/basicauth")):
+        logging.info(f"Request: {request.method} {request.path} from {request.remote_addr} with data {request.headers}; {await request.get_json()}")
 
 # SCSS
 
@@ -264,6 +265,26 @@ async def delete_reservation():
     if reservation:
         return {"code": 200, "message": "Reservation deleted"}, 200
     return {"code": 404, "message": "Reservation not found"}, 404
+
+
+@app.route("/api/lecturers/<uuid>/password-change", methods=["PUT"])
+async def change_password(uuid):
+    data = await request.get_json()
+
+    lecturer_uuid = await db.get_lecturer_uuid_from_token(data["token"])
+
+    if lecturer_uuid is None:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    if lecturer_uuid != uuid:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    success = await db.change_password(uuid, data["old_password"], data["new_password"])
+
+    if success:
+        return {"code": 200, "message": "Password changed"}, 200
+    
+    return {"code": 401, "message": "Invalid password"}, 401
 
 
 # Server utilities

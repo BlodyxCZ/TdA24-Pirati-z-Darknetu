@@ -46,13 +46,69 @@ def send_new_reservation_email(reciever_email):
 
     text = """\
     Dobrý den,
-    byla Vám vytvořena nová rezervace. Můžete si ji zobrazit, potvrdit nebo smazat zde.
+    byla Vám vytvořena nová rezervace. Můžete ji zobrazit, potvrdit nebo smazat zde.
     """
     html = """\
     <html>
     <body>
         <p>Dobrý den,<br>
-        byla Vám vytvořena nová rezervace. Můžete si ji zobrazit, potvrdit nebo smazat zde.<br>
+        byla Vám vytvořena nová rezervace. Můžete ji zobrazit, potvrdit nebo smazat zde.<br>
+        </p>
+    </body>
+    </html>
+    """
+
+    part1 = MIMEText(text, "plain")
+    part2 = MIMEText(html, "html")
+
+    message.attach(part1)
+    message.attach(part2)
+
+    send_email(reciever_email, message)
+
+def send_reservation_confirmed_email(reciever_email):
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "TdA - Nová rezervace"
+    message["From"] = sender_email
+    message["To"] = reciever_email
+
+    text = """\
+    Dobrý den,
+    byla Vám vytvořena nová rezervace. Můžete ji zobrazit, potvrdit nebo smazat zde.
+    """
+    html = """\
+    <html>
+    <body>
+        <p>Dobrý den,<br>
+        byla Vám vytvořena nová rezervace. Můžete ji zobrazit, potvrdit nebo smazat zde.<br>
+        </p>
+    </body>
+    </html>
+    """
+
+    part1 = MIMEText(text, "plain")
+    part2 = MIMEText(html, "html")
+
+    message.attach(part1)
+    message.attach(part2)
+
+    send_email(reciever_email, message)
+
+def send_reservation_deleted_email(reciever_email):
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "TdA - Nová rezervace"
+    message["From"] = sender_email
+    message["To"] = reciever_email
+
+    text = """\
+    Dobrý den,
+    byla Vám vytvořena nová rezervace. Můžete ji zobrazit, potvrdit nebo smazat zde.
+    """
+    html = """\
+    <html>
+    <body>
+        <p>Dobrý den,<br>
+        byla Vám vytvořena nová rezervace. Můžete ji zobrazit, potvrdit nebo smazat zde.<br>
         </p>
     </body>
     </html>

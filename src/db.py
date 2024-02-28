@@ -79,7 +79,7 @@ async def get_tags(tag_ids: list) -> list:
 
 async def post_lecturer(data) -> dict:
     await check_db_connection()
-    data["bio"] = re.sub(r"<(?!\/?(b|i|u|strong|em)(?=>|\s.*>))\/?.*?>", "", data["bio"]) # remove unallowed HTML tags
+    data["bio"] = re.sub(r"<(?!\/?(b|i|u|strong|em|a|p|br|li|ul|ol)(?=>|\s.*>))\/?.*?>", "", data["bio"]) # remove unallowed HTML tags
     
     if "tags" in data:
         tags = []
@@ -125,6 +125,32 @@ async def login(data: dict) -> dict:
     }))[0]["result"][0]["session_token"]
 
     return {"code": 200, "message": "Logged in", "token": token}
+
+
+async def change_password(uuid, old_password, new_password) -> bool:
+    await check_db_connection()
+
+    lecturer = (await db.query("SELECT password FROM lecturers WHERE id = type::thing('lecturers', $uuid);", vars={
+        "uuid": uuid
+    }))[0]["result"]
+
+    if len(lecturer) == 0:
+        return False
+    
+    password_salted = lecturer[0]["password"]
+
+    if not bcrypt.checkpw(old_password.encode(), password_salted.encode()) :
+        return False
+    
+    new_password = bcrypt.hashpw(bytes(new_password, "utf-8"), bcrypt.gensalt()).decode()
+
+    success = (await db.query("UPDATE type::thing('lecturers', $uuid) SET password = $new_password;", vars={
+        "uuid": uuid,
+        "new_password": new_password
+    }))[0]["result"]
+
+    return success != []
+    
 
 async def put_lecturer(uuid, data) -> dict or None:
     await check_db_connection()
@@ -231,4 +257,4 @@ async def close() -> None:
     await db.close()
 
 
-# <(?!\/?(b|i|u|strong|em)(?=>|\s.*>))\/?.*?>
+# <(?!\/?(b|i|u|strong|em|a|p|br|li|ul|ol)(?=>|\s.*>))\/?.*?>
