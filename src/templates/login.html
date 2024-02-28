@@ -15,7 +15,26 @@
 
     <body>
         <main class="fullscreen">
-
+            <div class="login-box">
+                <div>
+                    <img
+                        src="{{ url_for('static', filename='images/TdA_LOGO/TeacherDigitalAgency_LOGO_colour-black.svg') }}">
+                </div>
+                <div class="input-style">
+                    <input type="text" placeholder="USERNAME" id="username">
+                </div>
+                <div class="input-style">
+                    <input type="password" placeholder="PASSWORD" id="password">
+                </div>
+                <div class="split-h">
+                    <div class="button-style input-style" id="back">
+                        BACK
+                    </div>
+                    <div class="button-style input-style" id="login">
+                        LOGIN
+                    </div>
+                </div>
+            </div>
         </main>
     </body>
 
