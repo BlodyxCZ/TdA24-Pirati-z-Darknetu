@@ -28,11 +28,14 @@ main {
             vertical-align: bottom;
         }
 
+        td:first-child {
+            padding: 1em;
+        }
+
         td {
             color: var(--white);
             border: solid var(--white);
             border-radius: 0.5em;
-            padding: 1em;
             text-align: center;
         }
     }
@@ -43,3 +46,16 @@ main {
 }
 
 .minute-column {}
+
+.hour-flex {
+    display: flex;
+    flex-direction: row;
+    gap: 1px;
+    align-items: stretch;
+    height: 3em;
+    padding: 0.25em;
+
+    >div {
+        border-radius: 0.25em;
+    }
+}
