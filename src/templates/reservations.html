@@ -9,10 +9,11 @@
         <link href="https://fonts.googleapis.com/css?family=Lalezar" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="/css/reservations.css">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-        <script type="text/javascript" src="/js/reservations.js"></script>
         <script type="text/javascript">
             const uuid = "{{ uuid }}";
         </script>
+        <script type="text/javascript" src="/js/cookie.js"></script>
+        <script type="text/javascript" src="/js/reservations.js"></script>
         <title>Teacher Digital Agency</title>
     </head>
 
@@ -20,7 +21,7 @@
         <main class="fullscreen split-h">
             <div class="date-picker">
                 <div>
-                    <input type="date">
+                    <input id="date" type="date">
                 </div>
             </div>
             <div class="timetable">
