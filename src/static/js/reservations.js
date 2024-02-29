@@ -6,7 +6,21 @@ var tomorrow = clone(today) + new Date(0, 0, 1);
 console.log(today, tomorrow);
 var token = null;
 
+var data_cache = null;
+var tags = [];
+
+const colorEmpty = "#777";
+const colorFree = "#0f0";
+const colorReservation = "#ff0";
+const colorReservationUnconfirmed = "#f00";
+const colorReservationConfirmed = "#ff0";
+
 document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+        getLecturers();
+        getTags();
+    }, 500);
+
     token = getCookie("token");
     const datePicker = document.getElementById("date");
     datePicker.value = today;
@@ -52,7 +66,7 @@ function loadReservations() {
 function displayReservations(data) {
     console.log(data);
 
-    data.sort(compareReservations);
+    data.sort(compareReservationsStart);
 
     console.log(data);
 
@@ -62,6 +76,8 @@ function displayReservations(data) {
         console.log("skipping: ", data[reservationIterator]);
         reservationIterator++;
     }
+
+    var ongoing = [];
 
     for (let i = 0; i < hours.length; i++) {
         let currentTime = clone(today);
@@ -75,48 +91,87 @@ function displayReservations(data) {
         while (currentTime.getTime() < nextHour.getTime()) {
             let segmentStart = clone(currentTime);
 
-            if (reservationIterator < data.length &&
+            ongoing.sort(compareReservationsEnd);
+
+            while (reservationIterator < data.length &&
                 currentTime.getTime() < new Date(data[reservationIterator].end_date).getTime() &&
                 currentTime.getTime() >= new Date(data[reservationIterator].start_date).getTime()) {
 
-                console.log("Rendering reservation: ", data[reservationIterator]);
+                console.log("Adding reservation to ongoing: ", data[reservationIterator]);
+                ongoing.push(data[reservationIterator]);
+                reservationIterator++;
+                ongoing.sort(compareReservationsEnd);
+            }
 
+            if (ongoing.length > 0) {
+                let segmentUUID = ongoing[0].uuid;
+                let segmentEnd = new Date(ongoing[0].end_date);
+                let type = ongoing[0].type;
+                if (token != null && type == "reservation") {
+                    if (ongoing[0].confirmed) {
+                        type += "_confirmed";
+                    } else {
+                        type += "_unconfirmed";
+                    }
+                }
 
-                let segmentUUID = data[reservationIterator].uuid;
-                let segmentEnd = new Date(data[reservationIterator].end_date);
-                if (segmentEnd.getTime() > nextHour.getTime()) {
+                if (segmentEnd.getTime() >= new Date(data[reservationIterator].start_date).getTime()) {
+                    segmentEnd = new Date(data[reservationIterator].start_date);
+                } else if (segmentEnd.getTime() > nextHour.getTime()) {
                     segmentEnd = clone(nextHour);
                 } else {
-                    reservationIterator++;
+                    ongoing.splice(0, 1);
                 }
-                hour.appendChild(createSegment(segmentStart, segmentEnd, "#ff0", segmentUUID));
+                hour.appendChild(createSegment(segmentStart, segmentEnd, type, segmentUUID));
                 currentTime = clone(segmentEnd);
             } else {
                 let segmentEnd = reservationIterator < data.length ? new Date(data[reservationIterator].start_date) : clone(nextHour);
                 if (segmentEnd.getTime() > nextHour.getTime()) {
                     segmentEnd = clone(nextHour);
                 }
-                hour.appendChild(createSegment(segmentStart, segmentEnd, "#f00", null));
+                hour.appendChild(createSegment(segmentStart, segmentEnd, "empty", null));
                 currentTime = clone(segmentEnd);
             }
         }
     }
 }
 
-function createSegment(start, end, color, uuid) {
+function createSegment(start, end, type, uuid) {
     let diff = new Date(end.getTime() - start.getTime());
     const element = document.createElement("div");
     console.log("diff: ", diff.getUTCHours() * 60 + diff.getUTCMinutes());
     element.style.flexGrow = diff.getUTCHours() * 60 + diff.getUTCMinutes();
-    element.style.background = color;
-    element.style.cursor = "pointer";
+    switch (type) {
+        case "empty":
+            element.style.background = colorEmpty;
+            break;
+        case "free_time":
+            element.style.background = colorFree;
+            break;
+        case "reservation":
+            element.style.background = colorReservation;
+            break;
+        case "reservation_confirmed":
+            element.style.background = colorReservationConfirmed;
+            break;
+        case "reservation_unconfirmed":
+            element.style.background = colorReservationUnconfirmed;
+            break;
+        default:
+            break;
+    }
     element.setAttribute("start-time", start);
     element.setAttribute("end-time", end);
     element.setAttribute("uuid", uuid);
-    if (uuid == null) {
+    if (uuid == null && token != null) {
         element.addEventListener("click", openPopup);
-    } else {
+        element.style.cursor = "pointer";
+    } else if (uuid != null && token != null) {
         element.addEventListener("click", deleteFreeTime);
+        element.style.cursor = "pointer";
+    } else if (uuid != null && token == null) {
+        element.addEventListener("click", openPopup);
+        element.style.cursor = "pointer";
     }
     return element;
 }
@@ -127,12 +182,13 @@ function clone(date) {
 
 function openPopup(e) {
     document.getElementById("popup").style.display = "flex";
+
+    const startTime = new Date(e.target.getAttribute("start-time"));
+    const endTime = new Date(e.target.getAttribute("end-time"));
+
     if (token != null) {
         document.getElementById("lecturer-popup").style.display = "block";
         document.getElementById("student-popup").style.display = "none";
-
-        const startTime = new Date(e.target.getAttribute("start-time"));
-        const endTime = new Date(e.target.getAttribute("end-time"));
 
         document.getElementById("start-time").value = startTime.toTimeString().substring(0, 5);
         document.getElementById("end-time").value = endTime.toTimeString().substring(0, 5);
@@ -140,6 +196,9 @@ function openPopup(e) {
     } else {
         document.getElementById("lecturer-popup").style.display = "none";
         document.getElementById("student-popup").style.display = "block";
+
+        document.getElementById("reservation-start-time").value = startTime.toTimeString().substring(0, 5);
+        document.getElementById("reservation-end-time").value = endTime.toTimeString().substring(0, 5);
     }
 }
 
@@ -184,6 +243,7 @@ function submitLecturer() {
         .then((json) => {
             console.log(json);
             loadReservations();
+            closePopup();
         });
 }
 
@@ -207,18 +267,135 @@ function deleteFreeTime(e) {
         .then((json) => {
             console.log(json);
             loadReservations();
+
         });
 }
 
 function submitStudent() {
+    let startTime = document.getElementById("reservation-start-time").value;
+    let endTime = document.getElementById("reservation-end-time").value;
 
+    if (startTime == null ||
+        endTime == null ||
+        document.getElementById("tag-select").value == "" ||
+        document.getElementById("reservation-first-name").value == "" ||
+        document.getElementById("reservation-last-name").value == "" ||
+        document.getElementById("reservation-email").value == "") {
+        return;
+    }
+
+    let startDate = clone(today);
+    let endDate = clone(today);
+
+    startDate.setHours(startTime.substring(0, 2));
+    startDate.setMinutes(startTime.substring(3, 5));
+
+    endDate.setHours(endTime.substring(0, 2));
+    endDate.setMinutes(endTime.substring(3, 5));
+
+    if (startDate.getTime() >= endDate.getTime()) {
+        return;
+    }
+
+    let tag = findInSet((p) => p.name == document.getElementById("tag-select").value, tags);
+    console.log(tag);
+
+    fetch(`/api/reservations/${uuid}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            start_date: startDate.toISOString(),
+            end_date: endDate.toISOString(),
+            info: document.getElementById("reservation-info").value,
+            tag: tag.uuid,
+            student: {
+                first_name: document.getElementById("reservation-first-name").value,
+                last_name: document.getElementById("reservation-last-name").value,
+                email: document.getElementById("reservation-email").value,
+                phone_number: document.getElementById("reservation-phone").value,
+            }
+        })
+    })
+        .then((response) => response.json())
+        .then((json) => {
+            console.log(json);
+            loadReservations();
+            closePopup();
+        });
 }
 
-function compareReservations(a, b) {
+function compareReservationsStart(a, b) {
     if (new Date(a.start_date).getTime() < new Date(b.start_date).getTime()) {
         return -1;
     } else if (new Date(a.start_date).getTime() > new Date(b.start_date).getTime()) {
         return 1;
     }
     return 0;
+}
+function compareReservationsEnd(a, b) {
+    if (new Date(a.end_date).getTime() < new Date(b.end_date).getTime()) {
+        return -1;
+    } else if (new Date(a.end_date).getTime() > new Date(b.end_date).getTime()) {
+        return 1;
+    }
+    return 0;
+}
+
+async function getLecturers() {
+    console.log("Fetching lecturer list");
+    let response = fetch("/api/lecturers");
+    response.catch((err) => {
+        setTimeout(() => {
+            getLecturers();
+        }, 500);
+    });
+    response.then((res) => {
+        const data = res.json();
+        data.catch((err) => {
+            setTimeout(() => {
+                getLecturers();
+            }, 500);
+        });
+        data.then((json) => {
+            window.data_cache = json;
+            console.log(json);
+        });
+    });
+}
+
+function getTags() {
+    console.log("Fetching tags");
+    if (data_cache == null) {
+        setTimeout(() => {
+            getTags();
+        }, 500);
+        return;
+    }
+    let data = new Set();
+    for (let lecturer of data_cache) {
+        for (let tag of lecturer.tags) {
+            data.add(tag);
+        }
+    }
+    tags = data;
+    console.log(data);
+    updateTags(data);
+}
+
+function updateTags(data) {
+    const tag_select = document.getElementById("tag-list");
+    tag_select.innerHTML = "";
+
+    for (let tag of data) {
+        const element = document.createElement("option");
+        element.textContent = tag.name;
+
+        tag_select.appendChild(element);
+    }
+}
+
+function findInSet(pred, set) {
+    for (let item of set) if (pred(item)) return item;
 }
