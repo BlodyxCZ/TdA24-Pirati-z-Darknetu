@@ -81,27 +81,29 @@ function displayReservations(data) {
 
                 console.log("Rendering reservation: ", data[reservationIterator]);
 
+
+                let segmentUUID = data[reservationIterator].uuid;
                 let segmentEnd = new Date(data[reservationIterator].end_date);
                 if (segmentEnd.getTime() > nextHour.getTime()) {
                     segmentEnd = clone(nextHour);
                 } else {
                     reservationIterator++;
                 }
-                hour.appendChild(createSegment(segmentStart, segmentEnd, "#ff0", false));
+                hour.appendChild(createSegment(segmentStart, segmentEnd, "#ff0", segmentUUID));
                 currentTime = clone(segmentEnd);
             } else {
                 let segmentEnd = reservationIterator < data.length ? new Date(data[reservationIterator].start_date) : clone(nextHour);
                 if (segmentEnd.getTime() > nextHour.getTime()) {
                     segmentEnd = clone(nextHour);
                 }
-                hour.appendChild(createSegment(segmentStart, segmentEnd, "#f00", true));
+                hour.appendChild(createSegment(segmentStart, segmentEnd, "#f00", null));
                 currentTime = clone(segmentEnd);
             }
         }
     }
 }
 
-function createSegment(start, end, color, empty) {
+function createSegment(start, end, color, uuid) {
     let diff = new Date(end.getTime() - start.getTime());
     const element = document.createElement("div");
     console.log("diff: ", diff.getUTCHours() * 60 + diff.getUTCMinutes());
@@ -110,7 +112,12 @@ function createSegment(start, end, color, empty) {
     element.style.cursor = "pointer";
     element.setAttribute("start-time", start);
     element.setAttribute("end-time", end);
-    element.addEventListener("click", openPopup);
+    element.setAttribute("uuid", uuid);
+    if (uuid == null) {
+        element.addEventListener("click", openPopup);
+    } else {
+        element.addEventListener("click", deleteFreeTime);
+    }
     return element;
 }
 
@@ -170,6 +177,29 @@ function submitLecturer() {
         body: JSON.stringify({
             start_date: startDate.toISOString(),
             end_date: endDate.toISOString(),
+            token: token
+        })
+    })
+        .then((response) => response.json())
+        .then((json) => {
+            console.log(json);
+            loadReservations();
+        });
+}
+
+function deleteFreeTime(e) {
+    if (!confirm("Opravdu chcete smazat tento volný čas?")) {
+        return;
+    }
+
+    fetch(`/api/free-times/${uuid}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Basic ${token}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            uuid: e.target.getAttribute("uuid"),
             token: token
         })
     })
