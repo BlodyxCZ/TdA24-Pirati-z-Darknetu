@@ -264,7 +264,9 @@ async def post_reservation(uuid):
     response = await db.post_reservation(data)
 
     try:
-        utils.email.send_new_reservation_email(data["student"]["email"])
+        lecturer = await db.get_lecturer(uuid)
+        logging.info(f"Sending email to {lecturer['contact']['emails'][0]}")
+        utils.email.send_new_reservation_email(lecturer["contact"]["emails"][0], response)
     except:
         pass
 
@@ -280,9 +282,16 @@ async def confirm_reservation():
     if lecturer_uuid is None:
         return {"code": 401, "message": "Invalid token"}, 401
 
-    reservation = await db.confirm_reservation(lecturer_uuid, data["reservation"])
+    success = await db.confirm_reservation(lecturer_uuid, data["reservation"])
 
-    if reservation:
+    if success:
+        try:
+            reservation = await db.get_reservation_by_uuid(data["reservation"])
+            logging.info(f"Sending email to {reservation['student']['email']}")
+            utils.email.send_reservation_confirmed_email(reservation["student"]["email"], reservation)
+        except:
+            pass
+
         return {"code": 200, "message": "Reservation confirmed"}, 200
     return {"code": 404, "message": "Reservation not found"}, 404
 
@@ -298,7 +307,13 @@ async def delete_reservation():
 
     reservation = await db.delete_reservation(lecturer_uuid, data["reservation"])
 
-    if reservation:
+    if reservation != []:
+        try:
+            logging.info(f"Sending email to {reservation[0]['student']['email']}")
+            utils.email.send_reservation_deleted_email(reservation[0]["student"]["email"], reservation[0])
+        except:
+            pass
+
         return {"code": 200, "message": "Reservation deleted"}, 200
     return {"code": 404, "message": "Reservation not found"}, 404
 
@@ -413,6 +428,10 @@ async def exit_handler() -> None:
     print("Closing database connection...")
     await db.close()
     os.exit(0)
+
+
+def log_error(message):
+    logging.error(message)
 
 
 def main() -> None:

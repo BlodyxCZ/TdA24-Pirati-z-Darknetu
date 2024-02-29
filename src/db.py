@@ -243,15 +243,15 @@ async def get_lecturer_uuid_from_token(token) -> str or None:
     return None if uuid == [] else uuid[0]
 
 
-async def delete_reservation(lecturer_uuid, reservation_uuid) -> bool:
+async def delete_reservation(lecturer_uuid, reservation_uuid) -> dict or None:
     await check_db_connection()
 
-    success = (await db.query('DELETE type::thing("reservations", $reservation_uuid) WHERE lecturer = type::thing("lecturers", $lecturer_uuid) RETURN BEFORE;', vars={
+    reservation = (await db.query('SELECT * FROM (DELETE type::thing("reservations", $reservation_uuid) WHERE lecturer = type::thing("lecturers", $lecturer_uuid) RETURN BEFORE) FETCH lecturer;', vars={
         "reservation_uuid": reservation_uuid,
         "lecturer_uuid": lecturer_uuid
     }))[0]["result"]
 
-    return success != []
+    return reservation
 
 
 async def post_free_time(lecturer_uuid, data) -> dict or None:
@@ -285,6 +285,16 @@ async def delete_free_time(lecturer_uuid, free_time_uuid) -> bool:
     }))[0]["result"]
 
     return success != []
+
+
+async def get_reservation_by_uuid(uuid) -> dict:
+    await check_db_connection()
+
+    reservation = (await db.query('SELECT * FROM type::thing("reservations", $uuid) FETCH lecturer;', vars={
+        "uuid": uuid
+    }))[0]["result"][0]
+
+    return reservation
 
 
 async def close() -> None:
