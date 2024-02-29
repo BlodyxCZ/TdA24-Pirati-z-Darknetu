@@ -45,7 +45,9 @@ main {
     width: 4em;
 }
 
-.minute-column {}
+.minute-column {
+    justify-content: space-between;
+}
 
 .hour-flex {
     display: flex;
@@ -57,5 +59,21 @@ main {
 
     >div {
         border-radius: 0.25em;
+    }
+}
+
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+
+    >div {
+        background: var(--white);
+        padding: 2em;
+        border-radius: 1em;
     }
 }

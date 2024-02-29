@@ -42,24 +42,8 @@ main {
     flex-grow: 1;
 }
 
-.change-button {
-    display: block;
-    text-decoration: none;
-    text-align: center;
+.button {
     padding: 0.5em 4em;
-    border-radius: 0.5em;
-    border: solid 2px var(--jet);
-    background: var(--white);
-    color: var(--jet);
-    cursor: pointer;
-    margin-top: 1em;
-
-    transition: all ease-in-out 0.2s;
-
-    &:hover {
-        background: var(--jet);
-        color: var(--white);
-    }
 }
 
 .info-box {

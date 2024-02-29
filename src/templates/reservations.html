@@ -31,8 +31,10 @@
                             <th class="hour-column">
 
                             </th>
-                            <th class="minute-column">
-                                00 30 59
+                            <th class="split-h minute-column">
+                                <div>00</div>
+                                <div>30</div>
+                                <div>59</div>
                             </th>
                         </tr>
                     </thead>
@@ -53,6 +55,39 @@
                 </table>
             </div>
         </main>
+        <div id="popup" class="popup fullscreen" style="display: none;">
+            <div id="lecturer-popup" style="display: none;">
+                <div>
+                    <label for="start-time">Začátek:</label>
+                    <input id="start-time" type="time">
+                </div>
+                <div>
+                    <label for="end-time">Konec:</label>
+                    <input id="end-time" type="time">
+                </div>
+                <div class="split-h">
+                    <div id="back-lecturer" class="button">
+                        Zpět
+                    </div>
+                    <div id="submit-lecturer" class="button">
+                        Vytvořit
+                    </div>
+                </div>
+            </div>
+            <div id="student-popup" style="display: none;">
+                <div>
+
+                </div>
+                <div class="split-h">
+                    <div id="back-student" class="button">
+                        Zpět
+                    </div>
+                    <div id="submit-student" class="button">
+                        Zarezervovat
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
 
 </html>
