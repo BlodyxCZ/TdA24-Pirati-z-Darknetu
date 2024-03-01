@@ -289,6 +289,16 @@ async def get_free_times(lecturer_uuid) -> list:
     return free_times
 
 
+async def toggle_email_recieve(lecturer_uuid, value: bool) -> bool:
+    await check_db_connection()
+
+    success = (await db.query('UPDATE type::thing("lecturers", $uuid) SET recieve_email = $value;', vars={
+        "uuid": lecturer_uuid,
+        "value": value
+    }))[0]["result"]
+
+    return success != []
+
 async def delete_free_time(lecturer_uuid, free_time_uuid) -> bool:
     await check_db_connection()
 
