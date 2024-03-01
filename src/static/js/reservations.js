@@ -231,7 +231,7 @@ function createSegment(start, end, type, uuid) {
         element.addEventListener("click", openPopup);
         element.style.cursor = "pointer";
     } else if (type == "free_time" && token != null) {
-        element.addEventListener("click", function() { deleteFreeTime(uuid) });
+        element.addEventListener("click", function () { deleteFreeTime(uuid) });
         element.style.cursor = "pointer";
     } else if ((type == "reservation_confirmed" || type == "reservation_unconfirmed") && token != null) {
         element.addEventListener("click", function () { openPopup2(uuid) });

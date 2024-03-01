@@ -69,6 +69,10 @@ main {
     >div {
         border-radius: 0.25em;
         flex-basis: 0;
+
+        >p {
+            pointer-events: none;
+        }
     }
 }
 
