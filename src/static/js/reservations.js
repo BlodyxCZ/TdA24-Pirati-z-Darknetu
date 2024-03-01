@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     token = getCookie("token");
     const datePicker = document.getElementById("date");
-    datePicker.value = today.toISOString().substring(0, 10);
+    datePicker.value = `${today.getFullYear()}-${('0' + (today.getMonth() + 1)).slice(-2)}-${('0' + today.getDate()).slice(-2)}`;
 
     datePicker.addEventListener("change", () => {
         today = new Date(datePicker.value);
@@ -94,7 +94,7 @@ function downloadiCal(date) {
                 alert("Na daný den není žádná rezevace.");
                 return;
             }
-            
+
             // download a file
             const blob = new Blob([json.ical], { type: 'text/calendar' });
             const blobUrl = URL.createObjectURL(blob);
