@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     token = getCookie("token");
     const datePicker = document.getElementById("date");
-    datePicker.value = today;
+    datePicker.value = today.toISOString().substring(0, 10);
 
     datePicker.addEventListener("change", () => {
         today = new Date(datePicker.value);
@@ -117,7 +117,7 @@ function displayReservations(data) {
 
     let reservationIterator = 0;
 
-    while (new Date(data[reservationIterator].end_date) <= today || new Date(data[reservationIterator].start_date) > tomorrow) {
+    while (reservationIterator < data.length && (new Date(data[reservationIterator].end_date) <= today || new Date(data[reservationIterator].start_date) > tomorrow)) {
         console.log("skipping: ", data[reservationIterator]);
         reservationIterator++;
     }
@@ -227,7 +227,7 @@ function createSegment(start, end, type, uuid) {
         element.addEventListener("click", deleteFreeTime);
         element.style.cursor = "pointer";
     } else if ((type == "reservation_confirmed" || type == "reservation_unconfirmed") && token != null) {
-        element.addEventListener("click", function(){openPopup2(uuid)});
+        element.addEventListener("click", function () { openPopup2(uuid) });
         element.style.cursor = "pointer";
     } else if (uuid != null && token == null) {
         element.addEventListener("click", openPopup);
@@ -292,7 +292,7 @@ function openPopup2(uuid) {
     document.getElementById("lecturer-reservation-info").innerText = `Info: ${reservation.info}`;
     document.getElementById("lecturer-reservation-tag").innerText = `Tag: ${getTagNameByUUID(reservation.tag)}`;
     document.getElementById("lecturer-reservation-datetime").innerText = `Datum a čas: ${new Date(reservation.start_date).toLocaleString()} - ${new Date(reservation.end_date).toLocaleString()}`;
-    
+
     document.getElementById("lecturer-reservation-first_name").innerText = `Jméno: ${reservation.student.first_name}`;
     document.getElementById("lecturer-reservation-last_name").innerText = `Příjmení: ${reservation.student.last_name}`;
     document.getElementById("lecturer-reservation-email").innerText = `Email: ${reservation.student.email}`;
