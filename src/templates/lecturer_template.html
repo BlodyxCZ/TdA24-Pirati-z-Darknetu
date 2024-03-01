@@ -9,6 +9,7 @@
         <link href="https://fonts.googleapis.com/css?family=Lalezar" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/base-min.css">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <script type="text/javascript" src="/js/lecturer.js"></script>
         <title>Tour de App</title>
     </head>
 
@@ -45,6 +46,9 @@
                             <div>Cena za hodinu: {{ lecturer["price_per_hour"] }} Kč</div>
                             <div>Tel. číslo: <a class="d-bg" href="tel:{{ lecturer['contact']['telephone_numbers'][0] }}">{{ lecturer["contact"]["telephone_numbers"][0] }}</a></div>
                             <div>Email: <a class="d-bg" href="mailto:{{ lecturer['contact']['emails'][0] }}">{{ lecturer["contact"]["emails"][0] }}</a></div>
+                        </div>
+                        <div id="reservation-button">
+                            Rezervovat
                         </div>
                         <div class="tda-logo-container">
                             <img src="{{ url_for('static', filename='images/TdA_LOGO/TeacherDigitalAgency_LOGO_colour-white.png') }}" />

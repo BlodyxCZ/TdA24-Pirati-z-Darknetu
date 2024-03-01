@@ -34,6 +34,22 @@ main {
 
 }
 
+#back {
+    &:hover {
+        background-color: var(--sunglow);
+        color: black;
+        transition: 0.3s ease;
+    }
+}
+
+#login {
+    &:hover {
+        background-color: var(--sunglow);
+        color: black;
+        transition: 0.3s ease;
+    }
+}
+
 .button-style {
     cursor: pointer;
 }
