@@ -120,7 +120,7 @@ async def login(data: dict) -> dict:
     if not bcrypt.checkpw(data["password"].encode(), password_salted.encode()):
         return {"code": 401, "message": "Invalid password"}
 
-    token = (await db.query("CREATE logins CONTENT {lecturer: type::thing('lecturers', $lecturer), session_token: rand::uuid::v7(), datetime: time::now()} RETURN session_token;", vars={
+    token = (await db.query("CREATE logins CONTENT {lecturer: type::thing('lecturers', $lecturer), session_token: rand::uuid::v7(), datetime: time::now(), expiry_date: time::now() + 2d} RETURN session_token;", vars={
         "lecturer": lecturer[0]["uuid"],
     }))[0]["result"][0]["session_token"]
 
@@ -248,7 +248,7 @@ async def confirm_reservation(lecturer_uuid, reservation_uuid) -> bool:
 async def get_lecturer_uuid_from_token(token) -> str or None:
     await check_db_connection()
     
-    uuid = (await db.query('SELECT VALUE meta::id(lecturer) FROM logins WHERE session_token = $session_token;', vars={
+    uuid = (await db.query('SELECT VALUE meta::id(lecturer) FROM logins WHERE session_token = $session_token AND time::now() < expiry_date;', vars={
         "session_token": token
     }))[0]["result"]
 

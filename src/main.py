@@ -430,6 +430,11 @@ async def delete_free_time(uuid):
         return {"code": 200, "message": "Free time deleted"}, 200
     return {"code": 404, "message": "Free time not found"}, 404
 
+""" 
+@app.route("/api/lecturers/<uuid>/email", methods=["POST"])
+async def toggle_email_sending(): """
+
+
 async def exit_handler() -> None:
     print("Closing database connection...")
     await db.close()
