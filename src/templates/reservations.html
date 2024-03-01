@@ -23,6 +23,9 @@
                 <div>
                     <input id="date" type="date">
                 </div>
+                <div id="ical-button">
+                    Stáhnout iCal soubor
+                </div>
             </div>
             <div class="timetable">
                 <table>
@@ -57,24 +60,7 @@
         </main>
         <div id="popup" class="popup fullscreen" style="display: none;">
             <div id="lecturer-popup" style="display: none;">
-                <div>
-                    <label for="start-time">Začátek:</label>
-                    <input id="start-time" type="time">
-                </div>
-                <div>
-                    <label for="end-time">Konec:</label>
-                    <input id="end-time" type="time">
-                </div>
-                <div class="split-h">
-                    <div id="back-lecturer" class="button">
-                        Zpět
-                    </div>
-                    <div id="submit-lecturer" class="button">
-                        Vytvořit
-                    </div>
-                </div>
-            </div>
-            <div id="lecturer-popup" style="display: none;">
+                <h3>Vytvoření volného času</h3>
                 <div>
                     <label for="start-time">Začátek:</label>
                     <input id="start-time" type="time">
@@ -94,16 +80,17 @@
             </div>
             <div id="lecturer-reservation-popup" style="display: none;">
                 <div>
-                   <p id="lecturer-reservation-datetime">Datum a čas rezervace: </p>
-                   <p id="lecturer-reservation-state">Stav: </p>
-                   <p id="lecturer-reservation-tag">Tag: </p>
-                   <p id="lecturer-reservation-info">Info: </p>
-                   <br>
-                   <p style="text-decoration: underline;">Student: </p>
-                   <p id="lecturer-reservation-first_name">Jméno: </p>
-                   <p id="lecturer-reservation-last_name">Příjmení: </p>
-                   <p id="lecturer-reservation-email">Email: </p>
-                   <p id="lecturer-reservation-phone">Telefon: </p>
+                    <h3>Info o rezervaci</h3>
+                    <p id="lecturer-reservation-datetime">Datum a čas rezervace: </p>
+                    <p id="lecturer-reservation-state">Stav: </p>
+                    <p id="lecturer-reservation-tag">Tag: </p>
+                    <p id="lecturer-reservation-info">Info: </p>
+                    <br>
+                    <p style="text-decoration: underline;">Student: </p>
+                    <p id="lecturer-reservation-first_name">Jméno: </p>
+                    <p id="lecturer-reservation-last_name">Příjmení: </p>
+                    <p id="lecturer-reservation-email">Email: </p>
+                    <p id="lecturer-reservation-phone">Telefon: </p>
                 </div>
                 <div class="split-h">
                     <div id="back-lecturer-reservation" class="button">
@@ -118,6 +105,7 @@
                 </div>
             </div>
             <div id="student-popup" style="display: none;">
+                <h3>Vytvoření rezervace</h3>
                 <div>
                     <label for="reservation-start-time">Začátek:</label>
                     <input id="reservation-start-time" type="time">

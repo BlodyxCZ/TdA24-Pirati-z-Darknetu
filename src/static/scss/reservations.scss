@@ -14,6 +14,15 @@ main {
     }
 }
 
+#ical-button {
+    cursor: pointer;
+    background: var(--prussian-blue);
+    border-radius: 0.5em;
+    padding: 1em;
+    margin: 1em;
+    color: white;
+}
+
 .timetable {
     flex-grow: 1;
     overflow-y: scroll;
