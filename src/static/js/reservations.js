@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     token = getCookie("token");
     const datePicker = document.getElementById("date");
-    datePicker.value = today;
+    datePicker.value = today.toISOString().substring(0, 10);
 
     datePicker.addEventListener("change", () => {
         today = new Date(datePicker.value);
