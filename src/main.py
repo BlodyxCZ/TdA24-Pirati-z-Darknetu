@@ -431,9 +431,24 @@ async def delete_free_time(uuid):
         return {"code": 200, "message": "Free time deleted"}, 200
     return {"code": 404, "message": "Free time not found"}, 404
 
-""" 
-@app.route("/api/lecturers/<uuid>/email", methods=["POST"])
-async def toggle_email_sending(): """
+
+@app.route("/api/lecturers/<uuid>/recieve-emails", methods=["POST"])
+async def toggle_email_recieve(uuid):
+    data = await request.get_json()
+
+    lecturer_uuid = await db.get_lecturer_uuid_from_token(data["token"])
+
+    if lecturer_uuid is None:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    if lecturer_uuid != uuid:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    success = await db.toggle_email_recieve(uuid, data["value"])
+
+    if success:
+        return {"code": 200, "message": "Email sending toggled", "current_value": data["value"]}, 200
+    return {"code": 404, "message": "Lecturer not found"}, 404
 
 
 async def exit_handler() -> None:
