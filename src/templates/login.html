@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/base-min.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Lalezar" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="/css/login.css">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <script type="text/javascript" src="/js/cookie.js"></script>
+        <script type="text/javascript" src="/js/login.js"></script>
+        <title>Teacher Digital Agency</title>
+    </head>
+
+    <body>
+        <main class="fullscreen">
+            <div class="login-box">
+                <div>
+                    <img
+                        src="{{ url_for('static', filename='images/TdA_LOGO/TeacherDigitalAgency_LOGO_colour-black.svg') }}">
+                </div>
+                <div class="input-style">
+                    <input type="text" placeholder="USERNAME" id="username">
+                </div>
+                <div class="input-style">
+                    <input type="password" placeholder="PASSWORD" id="password">
+                </div>
+                <div class="split-h">
+                    <div class="button-style input-style" id="back">
+                        ZPĚT
+                    </div>
+                    <div class="button-style input-style" id="login">
+                        LOGIN
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+
+</html>

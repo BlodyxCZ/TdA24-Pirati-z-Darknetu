@@ -1,0 +1,63 @@
+@import "styles.scss";
+
+main {
+    background: var(--jet);
+    padding: 2em;
+
+    >div {
+        border-radius: 1em;
+        padding: 2em;
+        background: var(--white);
+    }
+
+    @media screen and (max-width: 1100px) {
+        .split-h {
+            flex-direction: column;
+        }
+    }
+}
+
+.separator {
+    min-width: 2px;
+    min-height: 2px;
+    flex-grow: 0;
+    border-radius: 9000px;
+    margin: 0 2em;
+    background: var(--jet);
+
+    @media screen and (max-width: 1100px) {
+        margin: 2em 0;
+    }
+}
+
+.avatar-change {
+    .avatar-image {
+        background: var(--jet);
+        border-radius: 1em;
+        max-width: 12em;
+    }
+}
+
+.info-change {
+    flex-grow: 1;
+}
+
+.button {
+    padding: 0.5em 4em;
+}
+
+.info-box {
+    >div {
+        flex-wrap: wrap;
+    }
+
+    table {
+        border-spacing: 1em;
+    }
+
+    input {
+        padding: 0.5em;
+        border-radius: 1em;
+        border: solid 2px var(--jet);
+    }
+}

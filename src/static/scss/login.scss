@@ -1,0 +1,55 @@
+@import "styles.scss";
+
+main {
+    display: flex;
+    background: var(--jet);
+    align-items: center;
+    justify-content: space-around;
+
+    .login-box {
+        background: var(--white);
+        max-width: 40em;
+        border-radius: 1em;
+        padding: 3em;
+
+        .split-h {
+            justify-content: space-around;
+        }
+    }
+}
+
+.input-style {
+    background: var(--jet);
+    color: var(--white);
+    padding: 1em 2em;
+    border-radius: 9000px;
+    margin-top: 1em;
+
+    input {
+        background: var(--jet);
+        color: var(--white);
+        border: none;
+        outline: none;
+    }
+
+}
+
+#back {
+    &:hover {
+        background-color: var(--sunglow);
+        color: black;
+        transition: 0.3s ease;
+    }
+}
+
+#login {
+    &:hover {
+        background-color: var(--sunglow);
+        color: black;
+        transition: 0.3s ease;
+    }
+}
+
+.button-style {
+    cursor: pointer;
+}

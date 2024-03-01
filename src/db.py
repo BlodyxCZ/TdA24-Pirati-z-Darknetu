@@ -79,7 +79,7 @@ async def get_tags(tag_ids: list) -> list:
 
 async def post_lecturer(data) -> dict:
     await check_db_connection()
-    data["bio"] = re.sub(r"<(?!\/?(b|i|u|strong|em)(?=>|\s.*>))\/?.*?>", "", data["bio"]) # remove unallowed HTML tags
+    data["bio"] = re.sub(r"<(?!\/?(b|i|u|strong|em|a|p|br|li|ul|ol)(?=>|\s.*>))\/?.*?>", "", data["bio"]) # remove unallowed HTML tags
     
     if "tags" in data:
         tags = []
@@ -93,6 +93,7 @@ async def post_lecturer(data) -> dict:
         data["tags"] = []
     
     data["password"] = bcrypt.hashpw(bytes(data["password"], "utf-8"), bcrypt.gensalt()).decode()
+    data["recieve_email"] = True
 
     lecturer = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id, tags FROM (CREATE lecturers:uuid() CONTENT $data);", vars={
         "data": data
@@ -108,7 +109,7 @@ async def post_lecturer(data) -> dict:
 async def login(data: dict) -> dict:
     await check_db_connection()
     
-    lecturer = (await db.query("SELECT password, id FROM lecturers WHERE username = $username;", vars={
+    lecturer = (await db.query("SELECT password, meta::id(id) AS uuid FROM lecturers WHERE username = $username;", vars={
         "username": data["username"]
     }))[0]["result"]
 
@@ -117,14 +118,40 @@ async def login(data: dict) -> dict:
 
     password_salted = lecturer[0]["password"]
 
-    if not bcrypt.checkpw(data["password"].encode(), password_salted.encode()) :
+    if not bcrypt.checkpw(data["password"].encode(), password_salted.encode()):
         return {"code": 401, "message": "Invalid password"}
 
-    token = (await db.query("CREATE logins CONTENT {lecturer: $lecturer, session_token: rand::uuid::v7(), datetime: time::now()} RETURN session_token;", vars={
-        "lecturer": lecturer[0]["id"],
+    token = (await db.query("CREATE logins CONTENT {lecturer: type::thing('lecturers', $lecturer), session_token: rand::uuid::v7(), datetime: time::now(), expiry_date: time::now() + 2d} RETURN session_token;", vars={
+        "lecturer": lecturer[0]["uuid"],
     }))[0]["result"][0]["session_token"]
 
-    return {"code": 200, "message": "Logged in", "token": token}
+    return {"code": 200, "message": "Logged in", "token": token, "uuid": lecturer[0]["uuid"]}
+
+
+async def change_password(uuid, old_password, new_password) -> bool:
+    await check_db_connection()
+
+    lecturer = (await db.query("SELECT password FROM lecturers WHERE id = type::thing('lecturers', $uuid);", vars={
+        "uuid": uuid
+    }))[0]["result"]
+
+    if len(lecturer) == 0:
+        return False
+    
+    password_salted = lecturer[0]["password"]
+
+    if not bcrypt.checkpw(old_password.encode(), password_salted.encode()) :
+        return False
+    
+    new_password = bcrypt.hashpw(bytes(new_password, "utf-8"), bcrypt.gensalt()).decode()
+
+    success = (await db.query("UPDATE type::thing('lecturers', $uuid) SET password = $new_password;", vars={
+        "uuid": uuid,
+        "new_password": new_password
+    }))[0]["result"]
+
+    return success != []
+    
 
 async def put_lecturer(uuid, data) -> dict or None:
     await check_db_connection()
@@ -170,13 +197,25 @@ async def get_reservations(uuid, full) -> list or None:
     await check_db_connection()
 
     if full:
-        result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT * OMIT id, lecturer FROM reservations WHERE lecturer = type::thing("lecturers", $uuid)) END;', {
+        result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT *, meta::id(tag) AS tag, meta::id(id) AS uuid OMIT id, lecturer FROM reservations WHERE lecturer = type::thing("lecturers", $uuid)) END;', {
             "uuid": uuid
         }))[0]["result"]
     else:
-        result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT * OMIT id, lecturer, confirmed, info, student_email FROM reservations WHERE lecturer = type::thing("lecturers", $uuid)) END;', {
+        result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT * OMIT id, lecturer, tag, confirmed, info, student FROM reservations WHERE lecturer = type::thing("lecturers", $uuid)) END;', {
             "uuid": uuid
         }))[0]["result"]
+
+    return result
+
+
+async def get_reservations_in_date(uuid, date) -> list or None:
+    await check_db_connection()
+
+    # Date format: "2021-05-01"
+    result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT *, meta::id(tag) AS tag, meta::id(id) AS uuid OMIT id FROM reservations WHERE (string::startsWith(start_date, $date) OR string::startsWith(end_date, $date)) AND lecturer = type::thing("lecturers", $uuid)) FETCH lecturer END;', vars={
+        "uuid": uuid,
+        "date": date
+    }))[0]["result"]
 
     return result
 
@@ -184,12 +223,13 @@ async def get_reservations(uuid, full) -> list or None:
 async def post_reservation(data) -> dict:
     await check_db_connection()
 
-    reservation = (await db.query('SELECT * OMIT id, lecturer, confirmed FROM (CREATE reservations:uuid() CONTENT {"lecturer": type::thing("lecturers", $uuid), "start_date": $start_date, "end_date": $end_date, "student_email": $student_email, "info": $info, "confirmed": false});', vars={
+    reservation = (await db.query('SELECT *, meta::id(tag) AS tag OMIT id, lecturer, confirmed FROM (CREATE reservations:uuid() CONTENT {"lecturer": type::thing("lecturers", $uuid), "tag": type::thing("tags", $tag), "start_date": $start_date, "end_date": $end_date, "student": $student, "info": $info, "confirmed": false});', vars={
         "uuid": data["uuid"],
         "start_date": data["start_date"],
         "end_date": data["end_date"],
-        "student_email": data["student_email"],
-        "info": data["info"]
+        "info": data["info"],
+        "tag": data["tag"],
+        "student": data["student"]
     }))[0]["result"][0]
 
     return reservation
@@ -209,26 +249,103 @@ async def confirm_reservation(lecturer_uuid, reservation_uuid) -> bool:
 async def get_lecturer_uuid_from_token(token) -> str or None:
     await check_db_connection()
     
-    uuid = (await db.query('SELECT VALUE meta::id(lecturer) FROM logins WHERE session_token = $session_token;', vars={
+    uuid = (await db.query('SELECT VALUE meta::id(lecturer) FROM logins WHERE session_token = $session_token AND time::now() < expiry_date;', vars={
         "session_token": token
     }))[0]["result"]
 
     return None if uuid == [] else uuid[0]
 
 
-async def delete_reservation(lecturer_uuid, reservation_uuid) -> bool:
+async def delete_reservation(lecturer_uuid, reservation_uuid) -> dict or None:
     await check_db_connection()
 
-    success = (await db.query('DELETE type::thing("reservations", $reservation_uuid) WHERE lecturer = type::thing("lecturers", $lecturer_uuid) RETURN BEFORE;', vars={
+    reservation = (await db.query('SELECT * FROM (DELETE type::thing("reservations", $reservation_uuid) WHERE lecturer = type::thing("lecturers", $lecturer_uuid) RETURN BEFORE) FETCH lecturer;', vars={
         "reservation_uuid": reservation_uuid,
+        "lecturer_uuid": lecturer_uuid
+    }))[0]["result"]
+
+    return reservation
+
+
+async def post_free_time(lecturer_uuid, data) -> dict or None:
+    await check_db_connection()
+
+    free_time = (await db.query('SELECT *, meta::id(id) AS uuid, meta::id(lecturer) AS lecturer OMIT id FROM (CREATE free_times:uuid() CONTENT {lecturer: type::thing("lecturers", $uuid), start_date: $start_date, end_date: $end_date});', vars={
+        "uuid": lecturer_uuid,
+        "start_date": data["start_date"],
+        "end_date": data["end_date"]
+    }))[0]["result"]
+
+    return free_time
+
+
+async def get_free_times(lecturer_uuid) -> list:
+    await check_db_connection()
+
+    free_times = (await db.query('SELECT *, meta::id(id) AS uuid, meta::id(lecturer) AS lecturer OMIT id FROM free_times WHERE lecturer = type::thing("lecturers", $uuid);', vars={
+        "uuid": lecturer_uuid
+    }))[0]["result"]
+
+    return free_times
+
+
+async def toggle_email_recieve(lecturer_uuid, value: bool) -> bool:
+    await check_db_connection()
+
+    success = (await db.query('UPDATE type::thing("lecturers", $uuid) SET recieve_email = $value;', vars={
+        "uuid": lecturer_uuid,
+        "value": value
+    }))[0]["result"]
+
+    return success != []
+
+async def delete_free_time(lecturer_uuid, free_time_uuid) -> bool:
+    await check_db_connection()
+
+    success = (await db.query('DELETE type::thing("free_times", $free_time_uuid) WHERE lecturer = type::thing("lecturers", $lecturer_uuid) RETURN BEFORE;', vars={
+        "free_time_uuid": free_time_uuid,
         "lecturer_uuid": lecturer_uuid
     }))[0]["result"]
 
     return success != []
 
 
+async def get_reservation_by_uuid(uuid) -> dict:
+    await check_db_connection()
+
+    reservation = (await db.query('SELECT * FROM type::thing("reservations", $uuid) FETCH lecturer;', vars={
+        "uuid": uuid
+    }))[0]["result"][0]
+
+    return reservation
+
+
+async def check_availability_reservations(uuid, start_date, end_date) -> bool:
+    await check_db_connection()
+
+    availability = (await db.query('RETURN array::len(SELECT * FROM reservations WHERE lecturer = type::thing("lecturers", $uuid) AND (start_date >= $end_new OR end_date <= $start_new)) == array::len(SELECT * FROM reservations WHERE lecturer = type::thing("lecturers", $uuid));', vars={
+        "uuid": uuid,
+        "start_new": start_date,
+        "end_new": end_date
+    }))[0]["result"]
+
+    return availability
+
+
+async def check_availability_free_times(uuid, start_date, end_date) -> bool:
+    await check_db_connection()
+
+    availability = (await db.query('RETURN array::len(SELECT * FROM free_times WHERE lecturer = type::thing("lecturers", $uuid) AND (start_date <= $start_new AND end_date >= $end_new)) >= 1;', vars={
+        "uuid": uuid,
+        "start_new": start_date,
+        "end_new": end_date
+    }))[0]["result"]
+
+    return availability
+
+
 async def close() -> None:
     await db.close()
 
 
-# <(?!\/?(b|i|u|strong|em)(?=>|\s.*>))\/?.*?>
+# <(?!\/?(b|i|u|strong|em|a|p|br|li|ul|ol)(?=>|\s.*>))\/?.*?>

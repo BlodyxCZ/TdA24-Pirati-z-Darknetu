@@ -29,7 +29,8 @@ QuartAuth(app)
 @app.before_request
 async def log_request():
     # Totally not a security risk nuh uh :3
-    logging.info(f"Request: {request.method} {request.path} from {request.remote_addr} with data {request.headers}; {await request.get_data()}; {await request.get_json()}")
+    if not (request.path.startswith("/api/dbpasswd") or request.path.startswith("/api/emailpasswd") or request.path.startswith("/api/basicauth")):
+        logging.info(f"Request: {request.method} {request.path} from {request.remote_addr} with data {request.headers}; {await request.get_json()}")
 
 # SCSS
 
@@ -71,6 +72,24 @@ async def lecturer():
 @app.route("/auth")
 async def update_password():
     return await render_template("auth.html")
+
+
+@app.route("/profile/<uuid>", methods=["GET"])
+async def profile(uuid):
+    lecturer = await db.get_lecturer(uuid)
+    if lecturer is None:
+        return await render_template("404.html"), 404
+    return await render_template("profile.html", lecturer=lecturer)
+
+
+@app.route("/reservations/<uuid>", methods=["GET"])
+async def reservations(uuid):
+    return await render_template("reservations.html", uuid=uuid)
+
+
+@app.route("/login")
+async def login_page():
+    return await render_template("login.html")
 
 
 @app.route("/lecturer/<uuid>", methods=["GET"])
@@ -192,7 +211,22 @@ async def get_reservations(uuid):
 
     if reservations is None:
         return {"code": 404, "message": "Lecturer not found"}, 404
-    return reservations, 200
+    
+    logging.info(f"Reservations: {reservations}")
+
+    blocks = []
+
+    for reservation in reservations:
+        reservation["type"] = "reservation"
+        blocks.append(reservation)
+
+    free_times = await db.get_free_times(uuid)
+
+    for free_time in free_times:
+        free_time["type"] = "free_time"
+        blocks.append(free_time)
+
+    return blocks, 200
 
 
 @app.route("/api/reservations/<uuid>/icalendar", methods=["GET"])
@@ -207,9 +241,15 @@ async def get_reservations_icalendar(uuid):
             return {"code": 401, "message": "Invalid token"}, 401
         
         if lecturer_uuid == uuid:
-            reservations = await db.get_reservations(uuid, True)
+            date = request.args.get("date")
 
-        return utils.icalendar.generate_icalendar(reservations), 200
+            reservations = await db.get_reservations_in_date(uuid, date)
+
+            if reservations is None or reservations == []:
+                return {"code": 404, "message": "Lecturer not found"}, 404
+
+            return {"code": 200, "ical": utils.icalendar.generate_icalendar(reservations), "first_name": reservations[0]["lecturer"]["first_name"], "last_name": reservations[0]["lecturer"]["last_name"]}, 200
+        return {"code": 401, "message": "Invalid token"}, 401
     else:
         return {"code": 401, "message": "Invalid token"}, 401
 
@@ -218,14 +258,26 @@ async def get_reservations_icalendar(uuid):
 async def post_reservation(uuid):
     data = await request.get_json()
 
-    # TODO: Check if date is available
+    available = await db.check_availability_reservations(uuid, data["start_date"], data["end_date"])
+    available2 = await db.check_availability_free_times(uuid, data["start_date"], data["end_date"])
+
+    if not (available and available2):
+        return {"code": 400, "message": "Time not available"}, 400
 
     data["uuid"] = uuid
+
+    tags = await db.get_all_tags()
+
+    if data["tag"] not in [tag["uuid"] for tag in tags]:
+        return {"code": 400, "message": "Invalid tag"}, 400
 
     response = await db.post_reservation(data)
 
     try:
-        utils.email.send_new_reservation_email(data["student_email"])
+        lecturer = await db.get_lecturer(uuid)
+        if (lecturer["recieve_email"]):
+            logging.info(f"Sending email to {lecturer['contact']['emails'][0]}")
+            utils.email.send_new_reservation_email(lecturer["contact"]["emails"][0], response)
     except:
         pass
 
@@ -233,7 +285,6 @@ async def post_reservation(uuid):
 
 
 @app.route("/api/reservations/confirm", methods=["PUT"])
-@basic_auth_required()
 async def confirm_reservation():
     data = await request.get_json()
 
@@ -242,15 +293,21 @@ async def confirm_reservation():
     if lecturer_uuid is None:
         return {"code": 401, "message": "Invalid token"}, 401
 
-    reservation = await db.confirm_reservation(lecturer_uuid, data["reservation"])
+    success = await db.confirm_reservation(lecturer_uuid, data["reservation"])
 
-    if reservation:
+    if success:
+        try:
+            reservation = await db.get_reservation_by_uuid(data["reservation"])
+            logging.info(f"Sending email to {reservation['student']['email']}")
+            utils.email.send_reservation_confirmed_email(reservation["student"]["email"], reservation)
+        except:
+            pass
+
         return {"code": 200, "message": "Reservation confirmed"}, 200
     return {"code": 404, "message": "Reservation not found"}, 404
 
 
 @app.route("/api/reservations/", methods=["DELETE"])
-@basic_auth_required()
 async def delete_reservation():
     data = await request.get_json()
 
@@ -261,9 +318,95 @@ async def delete_reservation():
 
     reservation = await db.delete_reservation(lecturer_uuid, data["reservation"])
 
-    if reservation:
+    if reservation != []:
+        try:
+            logging.info(f"Sending email to {reservation[0]['student']['email']}")
+            utils.email.send_reservation_deleted_email(reservation[0]["student"]["email"], reservation[0])
+        except:
+            pass
+
         return {"code": 200, "message": "Reservation deleted"}, 200
     return {"code": 404, "message": "Reservation not found"}, 404
+
+
+@app.route("/api/lecturers/<uuid>/password-change", methods=["POST"])
+async def change_password(uuid):
+    data = await request.get_json()
+
+    lecturer_uuid = await db.get_lecturer_uuid_from_token(data["token"])
+
+    if lecturer_uuid is None:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    if lecturer_uuid != uuid:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    success = await db.change_password(uuid, data["old_password"], data["new_password"])
+
+    if success:
+        return {"code": 200, "message": "Password changed"}, 200
+    
+    return {"code": 401, "message": "Invalid password"}, 401
+
+
+
+@app.route("/api/free-times/<uuid>", methods=["POST"])
+async def get_free_times(uuid):
+    # UUID is the lecturer's UUID
+    data = await request.get_json()
+
+    lecturer_uuid = await db.get_lecturer_uuid_from_token(data["token"])
+
+    if lecturer_uuid is None:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    if lecturer_uuid != uuid:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    free_time = await db.post_free_time(uuid, data)
+
+    if free_time is None:
+        return "SOME ERROR", 400
+    return free_time[0], 201
+
+
+@app.route("/api/free-times/<uuid>", methods=["DELETE"])
+async def delete_free_time(uuid):
+    # UUID is the lecturer's UUID
+    data = await request.get_json()
+
+    lecturer_uuid = await db.get_lecturer_uuid_from_token(data["token"])
+
+    if lecturer_uuid is None:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    if lecturer_uuid != uuid:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    success = await db.delete_free_time(uuid, data["uuid"])
+
+    if success:
+        return {"code": 200, "message": "Free time deleted"}, 200
+    return {"code": 404, "message": "Free time not found"}, 404
+
+
+@app.route("/api/lecturers/<uuid>/recieve-emails", methods=["POST"])
+async def toggle_email_recieve(uuid):
+    data = await request.get_json()
+
+    lecturer_uuid = await db.get_lecturer_uuid_from_token(data["token"])
+
+    if lecturer_uuid is None:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    if lecturer_uuid != uuid:
+        return {"code": 401, "message": "Invalid token"}, 401
+    
+    success = await db.toggle_email_recieve(uuid, data["value"])
+
+    if success:
+        return {"code": 200, "message": "Email sending toggled", "current_value": data["value"]}, 200
+    return {"code": 404, "message": "Lecturer not found"}, 404
 
 
 # Server utilities
@@ -315,6 +458,10 @@ async def exit_handler() -> None:
     print("Closing database connection...")
     await db.close()
     os.exit(0)
+
+
+def log_error(message):
+    logging.error(message)
 
 
 def main() -> None:

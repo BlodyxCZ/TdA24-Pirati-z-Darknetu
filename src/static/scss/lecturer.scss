@@ -118,6 +118,21 @@ a {
     }
 }
 
+#reservation-button {
+    cursor: pointer;
+    background: var(--sky-blue);
+    color: black;
+    padding: 1em 2em;
+    border-radius: 0.5em;
+    box-shadow: 0.5em 0.25em 0.25em #0005;
+    width: min-content;
+
+    &:hover {
+        background: var(--sunglow);
+        transition: 0.3s ease;
+    }
+}
+
 .name {
     font-size: 2em;
     font-family: "Lalezar";

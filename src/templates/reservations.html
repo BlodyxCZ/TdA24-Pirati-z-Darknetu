@@ -9,10 +9,11 @@
         <link href="https://fonts.googleapis.com/css?family=Lalezar" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="/css/reservations.css">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-        <script type="text/javascript" src="/js/reservations.js"></script>
         <script type="text/javascript">
-            const uuid = "{{ lecturer['uuid'] }}";
+            const uuid = "{{ uuid }}";
         </script>
+        <script type="text/javascript" src="/js/cookie.js"></script>
+        <script type="text/javascript" src="/js/reservations.js"></script>
         <title>Teacher Digital Agency</title>
     </head>
 
@@ -20,7 +21,10 @@
         <main class="fullscreen split-h">
             <div class="date-picker">
                 <div>
-                    <input type="date">
+                    <input id="date" type="date">
+                </div>
+                <div id="ical-button">
+                    Stáhnout iCal soubor
                 </div>
             </div>
             <div class="timetable">
@@ -30,19 +34,23 @@
                             <th class="hour-column">
 
                             </th>
-                            <th class="minute-column">
-                                00 30 59
+                            <th class="split-h minute-column">
+                                <div>00</div>
+                                <div>30</div>
+                                <div>59</div>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for i in range(23) %}
+                        {% for i in range(24) %}
                         <tr>
                             <td>
                                 {{ i }}:00
                             </td>
                             <td>
+                                <div id="hour-{{ i }}" class="hour-flex">
 
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
@@ -50,6 +58,100 @@
                 </table>
             </div>
         </main>
+        <div id="popup" class="popup fullscreen" style="display: none;">
+            <div id="lecturer-popup" style="display: none;">
+                <h3>Vytvoření volného času</h3>
+                <div>
+                    <label for="start-time">Začátek:</label>
+                    <input id="start-time" type="time">
+                </div>
+                <div>
+                    <label for="end-time">Konec:</label>
+                    <input id="end-time" type="time">
+                </div>
+                <div class="split-h">
+                    <div id="back-lecturer" class="button">
+                        Zpět
+                    </div>
+                    <div id="submit-lecturer" class="button">
+                        Vytvořit
+                    </div>
+                </div>
+            </div>
+            <div id="lecturer-reservation-popup" style="display: none;">
+                <div>
+                    <h3>Info o rezervaci</h3>
+                    <p id="lecturer-reservation-datetime">Datum a čas rezervace: </p>
+                    <p id="lecturer-reservation-state">Stav: </p>
+                    <p id="lecturer-reservation-tag">Tag: </p>
+                    <p id="lecturer-reservation-info">Info: </p>
+                    <br>
+                    <p style="text-decoration: underline;">Student: </p>
+                    <p id="lecturer-reservation-first_name">Jméno: </p>
+                    <p id="lecturer-reservation-last_name">Příjmení: </p>
+                    <p id="lecturer-reservation-email">Email: </p>
+                    <p id="lecturer-reservation-phone">Telefon: </p>
+                </div>
+                <div class="split-h">
+                    <div id="back-lecturer-reservation" class="button">
+                        Zpět
+                    </div>
+                    <div id="confirm-lecturer-reservation" class="button">
+                        Potvrdit rezervaci
+                    </div>
+                    <div id="delete-lecturer-reservation" class="button">
+                        Smazat rezervaci
+                    </div>
+                </div>
+            </div>
+            <div id="student-popup" style="display: none;">
+                <h3>Vytvoření rezervace</h3>
+                <div>
+                    <label for="reservation-start-time">Začátek:</label>
+                    <input id="reservation-start-time" type="time">
+                </div>
+                <div>
+                    <label for="reservation-end-time">Konec:</label>
+                    <input id="reservation-end-time" type="time">
+                </div>
+                <div>
+                    <label for="reservation-first-name">Jméno:</label>
+                    <input id="reservation-first-name" type="text">
+                </div>
+                <div>
+                    <label for="reservation-last-name">Příjmení:</label>
+                    <input id="reservation-last-name" type="text">
+                </div>
+                <div>
+                    <label for="reservation-email">Email:</label>
+                    <input id="reservation-email" type="text">
+                </div>
+                <div>
+                    <label for="reservation-phone">Tel.:</label>
+                    <input id="reservation-phone" type="text">
+                </div>
+                <div>
+                    <label for="reservation-info">Info:</label>
+                    <textarea id="reservation-info" type="time"></textarea>
+                </div>
+                <div>
+                    Tagy:
+                    <input list="tag-list" id="tag-select">
+                    <datalist id="tag-list">
+
+                    </datalist>
+                </div>
+
+                <div class="split-h">
+                    <div id="back-student" class="button">
+                        Zpět
+                    </div>
+                    <div id="submit-student" class="button">
+                        Zarezervovat
+                    </div>
+                </div>
+            </div>
+        </div>
     </body>
 
 </html>

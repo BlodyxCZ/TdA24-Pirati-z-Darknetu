@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/base-min.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Lalezar" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="/css/profile.css">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <script type="text/javascript">
+            const uuid = "{{ lecturer['uuid'] }}";
+        </script>
+        <script type="text/javascript" src="/js/cookie.js"></script>
+        <script type="text/javascript" src="/js/profile.js"></script>
+        <title>Teacher Digital Agency</title>
+    </head>
+
+    <body>
+        <main class="fullscreen">
+            <div class="split-h">
+                <div class="avatar-change">
+                    <div>
+                        <img id="avatar-image" class="avatar-image" src="{{ lecturer['picture_url'] }}">
+                    </div>
+                    <!-- No -->
+                    <!-- <div id="avatar-change-button" class="button">
+                        ZMĚNIT
+                    </div> -->
+                </div>
+                <div class="separator">
+
+                </div>
+                <div class="info-change split-v">
+                    <div class="info-box">
+                        <div class="split-h">
+                            <div>
+                                <table>
+                                    <!-- I give up. -->
+                                    <!-- <tr>
+                                        <td>
+                                            <label for="first-name">Jméno:</label>
+                                        </td>
+                                        <td>
+                                            <input id="first-name" type="text"
+                                                placeholder="{{ lecturer['first_name'] }}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="middle-name">Prostřední jméno:</label>
+                                        </td>
+                                        <td>
+                                            <input id="middle-name" type="text"
+                                                placeholder="{{ lecturer['middle_name'] }}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="last-name">Příjmení:</label>
+                                        </td>
+                                        <td>
+                                            <input id="last-name" type="text" placeholder="{{ lecturer['last_name'] }}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="title-before">Titul před:</label>
+                                        </td>
+                                        <td>
+                                            <input id="title-before" type="text"
+                                                placeholder="{{ lecturer['title_before'] }}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="title-after">Titul za:</label>
+                                        </td>
+                                        <td>
+                                            <input id="title-after" type="text"
+                                                placeholder="{{ lecturer['title_after'] }}">
+                                        </td>
+                                    </tr> -->
+                                    <tr>
+                                        <td>
+                                            <label for="receive-emails">Receive emails:</label>
+                                        </td>
+                                        <td>
+                                            <!-- Minor spelling mistake -->
+                                            <input id="receive-emails" type="checkbox"
+                                                checked="{{ lecturer['recieve_email'] }}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="old-password">Heslo:</label>
+                                        </td>
+                                        <td>
+                                            <input autocomplete="password" id="old-password" type="password">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="new-password">Nové heslo:</label>
+                                        </td>
+                                        <td>
+                                            <input autocomplete="new-password" id="new-password" type="password">
+                                        </td>
+                                    </tr>
+                                    <!-- <tr>
+                                        <td>
+                                            <label for="email">E-mail:</label>
+                                        </td>
+                                        <td>
+                                            <input id="email" type="text"
+                                                placeholder="{{ lecturer['contact']['emails'][0] }}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="phone">Tel.:</label>
+                                        </td>
+                                        <td>
+                                            <input id="phone" type="text"
+                                                placeholder="{{ lecturer['contact']['telephone_numbers'][0] }}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="city">Město:</label>
+                                        </td>
+                                        <td>
+                                            <input id="city" type="text" placeholder="{{ lecturer['location'] }}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="claim">Claim:</label>
+                                        </td>
+                                        <td>
+                                            <input id="claim" type="text" placeholder="{{ lecturer['claim'] }}">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label for="price">Cena za hodinu:</label>
+                                        </td>
+                                        <td>
+                                            <input id="price" type="text"
+                                                placeholder="{{ lecturer['price_per_hour'] }}">
+                                        </td>
+                                    </tr> -->
+                                </table>
+                            </div>
+                            <!-- <div>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <label for="bio">Bio:</label>
+                                        </td>
+                                        <td>
+                                            <textarea id="bio" placeholder="{{ lecturer['bio'] }}"></textarea>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div> -->
+                        </div>
+                    </div>
+                    <div id="info-change-button" class="button">
+                        ZMĚNIT HESLO
+                    </div>
+                    <a class="button" href="/reservations/{{ lecturer['uuid']}}">
+                        REZERVACE
+                    </a>
+                </div>
+            </div>
+        </main>
+    </body>
+
+</html>

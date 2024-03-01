@@ -7,6 +7,7 @@ def generate_icalendar(events: list):
     cal.add('prodid', '-//Teacher digital Agency//Katalog lektorů//cs-CZ')
     cal.add('version', '2.0')
 
+    # TODO: Výuka: JMÉNO PŘÍJMENÍ
     for event in events:
         e = Event()
         e.add('summary', "TdA Rezervace")
@@ -16,4 +17,4 @@ def generate_icalendar(events: list):
 
         cal.add_component(e)
 
-    return cal.to_ical()
+    return cal.to_ical().decode('utf-8')

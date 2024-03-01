@@ -14,6 +14,15 @@ main {
     }
 }
 
+#ical-button {
+    cursor: pointer;
+    background: var(--prussian-blue);
+    border-radius: 0.5em;
+    padding: 1em;
+    margin: 1em;
+    color: white;
+}
+
 .timetable {
     flex-grow: 1;
     overflow-y: scroll;
@@ -28,11 +37,14 @@ main {
             vertical-align: bottom;
         }
 
+        td:first-child {
+            padding: 1em;
+        }
+
         td {
             color: var(--white);
             border: solid var(--white);
             border-radius: 0.5em;
-            padding: 1em;
             text-align: center;
         }
     }
@@ -42,4 +54,40 @@ main {
     width: 4em;
 }
 
-.minute-column {}
+.minute-column {
+    justify-content: space-between;
+}
+
+.hour-flex {
+    display: flex;
+    flex-direction: row;
+    gap: 1px;
+    align-items: stretch;
+    height: 3em;
+    padding: 0.25em;
+
+    >div {
+        border-radius: 0.25em;
+        flex-basis: 0;
+
+        >p {
+            pointer-events: none;
+        }
+    }
+}
+
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+
+    >div {
+        background: var(--white);
+        padding: 2em;
+        border-radius: 1em;
+    }
+}
