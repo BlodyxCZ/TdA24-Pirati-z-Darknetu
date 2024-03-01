@@ -207,6 +207,18 @@ async def get_reservations(uuid, full) -> list or None:
     return result
 
 
+async def get_reservations_in_date(uuid, date) -> list or None:
+    await check_db_connection()
+
+    # Date format: "2021-05-01"
+    result = (await db.query('IF (SELECT * FROM lecturers WHERE id = type::thing("lecturers", $uuid)) = [] THEN RETURN null; ELSE RETURN (SELECT *, meta::id(tag) AS tag, meta::id(id) AS uuid OMIT id FROM reservations WHERE (string::startsWith(start_date, $date) OR string::startsWith(end_date, $date)) AND lecturer = type::thing("lecturers", $uuid)) FETCH lecturer END;', vars={
+        "uuid": uuid,
+        "date": date
+    }))[0]["result"]
+
+    return result
+
+
 async def post_reservation(data) -> dict:
     await check_db_connection()
 

@@ -241,9 +241,15 @@ async def get_reservations_icalendar(uuid):
             return {"code": 401, "message": "Invalid token"}, 401
         
         if lecturer_uuid == uuid:
-            reservations = await db.get_reservations(uuid, True)
+            date = request.args.get("date")
 
-        return utils.icalendar.generate_icalendar(reservations), 200
+            reservations = await db.get_reservations_in_date(uuid, date)
+
+            if reservations is None or reservations == []:
+                return {"code": 404, "message": "Lecturer not found"}, 404
+
+            return {"code": 200, "ical": utils.icalendar.generate_icalendar(reservations), "first_name": reservations[0]["lecturer"]["first_name"], "last_name": reservations[0]["lecturer"]["last_name"]}, 200
+        return {"code": 401, "message": "Invalid token"}, 401
     else:
         return {"code": 401, "message": "Invalid token"}, 401
 

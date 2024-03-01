@@ -31,6 +31,13 @@ document.addEventListener("DOMContentLoaded", () => {
         displayReservations(reservations);
     });
 
+    const downloadiCalButton = document.getElementById("ical-button");
+
+    downloadiCalButton.addEventListener("click", () => {
+        console.log("Downloading iCal");
+        downloadiCal(datePicker.value);
+    });
+
     const backLecturerButton = document.getElementById("back-lecturer");
     const backStudentButton = document.getElementById("back-student");
     const backLecturerReservationButton = document.getElementById("back-lecturer-reservation");
@@ -69,6 +76,35 @@ function loadReservations() {
         .then((json) => {
             reservations = json;
             displayReservations(reservations);
+        });
+}
+
+function downloadiCal(date) {
+    console.log(date);
+
+    fetch(`/api/reservations/${uuid}/icalendar?date=${date}`, {
+        method: "GET",
+        headers: token != null ? {
+            "Authorization": `Basic ${token}`
+        } : {}
+    })
+        .then((response) => response.json())
+        .then((json) => {
+            if (json.code != 200) {
+                alert("Na daný den není žádná rezevace.");
+                return;
+            }
+            
+            // download a file
+            const blob = new Blob([json.ical], { type: 'text/calendar' });
+            const blobUrl = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = `Výuka - ${json.first_name} ${json.last_name}.ics`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(blobUrl);
         });
 }
 

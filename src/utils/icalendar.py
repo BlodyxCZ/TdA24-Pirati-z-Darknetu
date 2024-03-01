@@ -8,8 +8,6 @@ def generate_icalendar(events: list):
     cal.add('version', '2.0')
 
     # TODO: Výuka: JMÉNO PŘÍJMENÍ
-    # Vygerevat na daný den
-    
     for event in events:
         e = Event()
         e.add('summary', "TdA Rezervace")
@@ -19,4 +17,4 @@ def generate_icalendar(events: list):
 
         cal.add_component(e)
 
-    return cal.to_ical()
+    return cal.to_ical().decode('utf-8')
