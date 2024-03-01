@@ -4,4 +4,32 @@ document.addEventListener("DOMContentLoaded", () => {
     if (token == null) {
         window.location = "/login";
     }
+
+    const submitButton = document.getElementById("info-change-button");
+    submitButton.addEventListener("click", (e) => {
+        const oldPassword = document.getElementById("old-password").value;
+        const newPassword = document.getElementById("new-password").value;
+
+        if (oldPassword == "" || newPassword == "") {
+            return;
+        }
+
+        fetch(`/api/lecturers/${uuid}/password-change`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                old_password: oldPassword,
+                new_password: newPassword,
+                token: token
+            })
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json);
+                alert(json.message);
+                window.location.reload();
+            });
+    });
 });

@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
                 console.log(json);
-                setCookie("token", json.token);
+                setCookie("token", json.token, 2);
                 console.log(getCookie("token"));
                 window.location = `/profile/${json.uuid}`;
             });
