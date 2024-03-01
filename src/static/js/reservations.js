@@ -167,14 +167,16 @@ function displayReservations(data) {
                 } else {
                     ongoing.splice(0, 1);
                 }
-                hour.appendChild(createSegment(segmentStart, segmentEnd, type, segmentUUID));
+                let segment = createSegment(segmentStart, segmentEnd, type, segmentUUID);
+                if (segment != null) hour.appendChild(segment);
                 currentTime = clone(segmentEnd);
             } else {
                 let segmentEnd = reservationIterator < data.length ? new Date(data[reservationIterator].start_date) : clone(nextHour);
                 if (segmentEnd.getTime() > nextHour.getTime()) {
                     segmentEnd = clone(nextHour);
                 }
-                hour.appendChild(createSegment(segmentStart, segmentEnd, "empty", null));
+                let segment = createSegment(segmentStart, segmentEnd, "empty", null);
+                if (segment != null) hour.appendChild(segment);
                 currentTime = clone(segmentEnd);
             }
         }
@@ -183,6 +185,11 @@ function displayReservations(data) {
 
 function createSegment(start, end, type, uuid) {
     let diff = new Date(end.getTime() - start.getTime());
+
+    if (diff.getUTCHours() * 60 + diff.getUTCMinutes() == 0) {
+        return null;
+    }
+
     const element = document.createElement("div");
     console.log("diff: ", diff.getUTCHours() * 60 + diff.getUTCMinutes());
     element.style.flexGrow = diff.getUTCHours() * 60 + diff.getUTCMinutes();
