@@ -8,6 +8,7 @@ var token = null;
 
 var data_cache = null;
 var tags = [];
+var selectedReservation = null;
 
 const colorEmpty = "#777";
 const colorFree = "#0f0";
@@ -32,15 +33,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const backLecturerButton = document.getElementById("back-lecturer");
     const backStudentButton = document.getElementById("back-student");
+    const backLecturerReservationButton = document.getElementById("back-lecturer-reservation");
 
     backLecturerButton.addEventListener("click", closePopup);
     backStudentButton.addEventListener("click", closePopup);
+    backLecturerReservationButton.addEventListener("click", closePopup);
 
     const submitLecturerButton = document.getElementById("submit-lecturer");
     const submitStudentButton = document.getElementById("submit-student");
 
     submitLecturerButton.addEventListener("click", submitLecturer);
     submitStudentButton.addEventListener("click", submitStudent);
+
+    const confirmReservationButton = document.getElementById("confirm-lecturer-reservation");
+    const deleteReservationButton = document.getElementById("delete-lecturer-reservation");
+
+    confirmReservationButton.addEventListener("click", confirmReservation);
+    deleteReservationButton.addEventListener("click", deleteReservation);
 
     for (let i = 0; i < 24; i++) {
         hours.push(document.getElementById(`hour-${i}`));
@@ -141,33 +150,48 @@ function createSegment(start, end, type, uuid) {
     const element = document.createElement("div");
     console.log("diff: ", diff.getUTCHours() * 60 + diff.getUTCMinutes());
     element.style.flexGrow = diff.getUTCHours() * 60 + diff.getUTCMinutes();
+    let p = document.createElement("p");
+    p.style.color = "black";
+
     switch (type) {
         case "empty":
             element.style.background = colorEmpty;
+            p.textContent = "";
             break;
         case "free_time":
             element.style.background = colorFree;
+            p.textContent = "Volný čas";
             break;
         case "reservation":
             element.style.background = colorReservation;
+            p.textContent = "Rezervace";
             break;
         case "reservation_confirmed":
             element.style.background = colorReservationConfirmed;
+            p.textContent = "Potvrzená rezervace";
             break;
         case "reservation_unconfirmed":
             element.style.background = colorReservationUnconfirmed;
+            p.textContent = "Nepotvrzená rezervace";
+            p.style.color = "white";
             break;
         default:
             break;
     }
+
+    element.setAttribute("type", type)
+    element.appendChild(p);
     element.setAttribute("start-time", start);
     element.setAttribute("end-time", end);
     element.setAttribute("uuid", uuid);
     if (uuid == null && token != null) {
         element.addEventListener("click", openPopup);
         element.style.cursor = "pointer";
-    } else if (uuid != null && token != null) {
+    } else if (type == "free_time" && token != null) {
         element.addEventListener("click", deleteFreeTime);
+        element.style.cursor = "pointer";
+    } else if ((type == "reservation_confirmed" || type == "reservation_unconfirmed") && token != null) {
+        element.addEventListener("click", function(){openPopup2(uuid)});
         element.style.cursor = "pointer";
     } else if (uuid != null && token == null) {
         element.addEventListener("click", openPopup);
@@ -189,6 +213,7 @@ function openPopup(e) {
     if (token != null) {
         document.getElementById("lecturer-popup").style.display = "block";
         document.getElementById("student-popup").style.display = "none";
+        document.getElementById("lecturer-reservation-popup").style.display = "none";
 
         document.getElementById("start-time").value = startTime.toTimeString().substring(0, 5);
         document.getElementById("end-time").value = endTime.toTimeString().substring(0, 5);
@@ -196,14 +221,51 @@ function openPopup(e) {
     } else {
         document.getElementById("lecturer-popup").style.display = "none";
         document.getElementById("student-popup").style.display = "block";
+        document.getElementById("lecturer-reservation-popup").style.display = "none";
 
         document.getElementById("reservation-start-time").value = startTime.toTimeString().substring(0, 5);
         document.getElementById("reservation-end-time").value = endTime.toTimeString().substring(0, 5);
     }
 }
 
+function getTagNameByUUID(uuid) {
+    for (let tag of tags) {
+        if (tag.uuid == uuid) {
+            return tag.name;
+        }
+    }
+}
+
+function openPopup2(uuid) {
+
+    let reservation = findInSet((p) => p.uuid == uuid, reservations);
+    selectedReservation = reservation;
+    console.log(reservation);
+
+    document.getElementById("popup").style.display = "flex";
+
+    if (reservation.confirmed) {
+        document.getElementById("confirm-lecturer-reservation").style.display = "none";
+    }
+
+    document.getElementById("lecturer-popup").style.display = "none";
+    document.getElementById("student-popup").style.display = "none";
+    document.getElementById("lecturer-reservation-popup").style.display = "block";
+
+    document.getElementById("lecturer-reservation-state").innerText = `Stav: ${reservation.confirmed ? "Potvrzená" : "Nepotvrzená"}`;
+    document.getElementById("lecturer-reservation-info").innerText = `Info: ${reservation.info}`;
+    document.getElementById("lecturer-reservation-tag").innerText = `Tag: ${getTagNameByUUID(reservation.tag)}`;
+    document.getElementById("lecturer-reservation-datetime").innerText = `Datum a čas: ${new Date(reservation.start_date).toLocaleString()} - ${new Date(reservation.end_date).toLocaleString()}`;
+    
+    document.getElementById("lecturer-reservation-first_name").innerText = `Jméno: ${reservation.student.first_name}`;
+    document.getElementById("lecturer-reservation-last_name").innerText = `Příjmení: ${reservation.student.last_name}`;
+    document.getElementById("lecturer-reservation-email").innerText = `Email: ${reservation.student.email}`;
+    document.getElementById("lecturer-reservation-phone").innerText = `Telefon: ${reservation.student.phone_number}`;
+}
+
 function closePopup() {
     document.getElementById("popup").style.display = "none";
+    selectedReservation = null;
 }
 
 function submitLecturer() {
@@ -244,6 +306,54 @@ function submitLecturer() {
             console.log(json);
             loadReservations();
             closePopup();
+        });
+}
+
+function confirmReservation() {
+    if (!confirm("Opravdu chcete potvrdit tuto rezervaci?")) {
+        return;
+    }
+
+    fetch(`/api/reservations/confirm`, {
+        method: "PUT",
+        headers: {
+            "Authorization": `Basic ${token}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            reservation: selectedReservation.uuid,
+            token: token
+        })
+    })
+        .then((response) => response.json())
+        .then((json) => {
+            console.log(json);
+            closePopup();
+            loadReservations();
+        });
+}
+
+function deleteReservation() {
+    if (!confirm("Opravdu chcete smazat tuto rezervaci?")) {
+        return;
+    }
+
+    fetch(`/api/reservations`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Basic ${token}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            reservation: selectedReservation.uuid,
+            token: token
+        })
+    })
+        .then((response) => response.json())
+        .then((json) => {
+            console.log(json);
+            closePopup();
+            loadReservations();
         });
 }
 
