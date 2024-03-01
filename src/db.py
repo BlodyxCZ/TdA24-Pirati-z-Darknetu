@@ -320,6 +320,18 @@ async def get_reservation_by_uuid(uuid) -> dict:
     return reservation
 
 
+async def check_availability(uuid, start_date, end_date) -> bool:
+    await check_db_connection()
+
+    availability = (await db.query('RETURN array::len(SELECT * FROM reservations WHERE lecturer = type::thing("lecturers", $uuid) AND (start_date >= $end_new OR end_date <= $start_new)) == array::len(SELECT * FROM reservations WHERE lecturer = type::thing("lecturers", $uuid));', vars={
+        "uuid": uuid,
+        "start_new": start_date,
+        "end_new": end_date
+    }))[0]["result"]
+
+    return availability
+
+
 async def close() -> None:
     await db.close()
 

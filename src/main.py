@@ -258,7 +258,10 @@ async def get_reservations_icalendar(uuid):
 async def post_reservation(uuid):
     data = await request.get_json()
 
-    # TODO: Check if date is available
+    available = await db.check_availability(uuid, data["start_date"], data["end_date"])
+
+    if not available:
+        return {"code": 400, "message": "Time not available"}, 400
 
     data["uuid"] = uuid
 
