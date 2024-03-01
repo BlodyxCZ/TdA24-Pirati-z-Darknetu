@@ -258,9 +258,10 @@ async def get_reservations_icalendar(uuid):
 async def post_reservation(uuid):
     data = await request.get_json()
 
-    available = await db.check_availability(uuid, data["start_date"], data["end_date"])
+    available = await db.check_availability_reservations(uuid, data["start_date"], data["end_date"])
+    available2 = await db.check_availability_free_times(uuid, data["start_date"], data["end_date"])
 
-    if not available:
+    if not (available and available2):
         return {"code": 400, "message": "Time not available"}, 400
 
     data["uuid"] = uuid
@@ -348,50 +349,6 @@ async def change_password(uuid):
     return {"code": 401, "message": "Invalid password"}, 401
 
 
-# Server utilities
-
-""" @app.before_request
-async def check_db_connection_before_request():
-    if not db.check_db_connection():
-        await db.init() """
-
-
-@app.route("/api/conn")
-async def check_db_connection():
-    await db.init()
-    return {"msg": "Tried to renew connection."}, 200
-
-
-@app.route("/api/log")
-async def log():
-    with open("logs.log", "r") as file:
-        return file.read(), 200
-
-
-@app.route("/api/dbpasswd", methods=["POST"])
-async def post_update_dbpassword():
-    with open("password.txt", "w+") as file:
-        file.write((await request.form)["password"])
-
-    await db.init()
-    return "Updated database password", 200
-
-
-@app.route("/api/emailpasswd", methods=["POST"])
-async def post_update_emailpassword():
-    with open("email_password.txt", "w+") as file:
-        file.write((await request.form)["password"])
-
-    utils.email.update_password()
-    return "Updated email password", 200
-
-
-@app.route("/api/basicauth", methods=["POST"])
-async def post_update_basicauth():
-    app.config["QUART_AUTH_BASIC_USERNAME"] = (await request.form)["username"]
-    app.config["QUART_AUTH_BASIC_PASSWORD"] = (await request.form)["password"]    
-    return "Basic Auth updated", 200
-
 
 @app.route("/api/free-times/<uuid>", methods=["POST"])
 async def get_free_times(uuid):
@@ -406,8 +363,6 @@ async def get_free_times(uuid):
     if lecturer_uuid != uuid:
         return {"code": 401, "message": "Invalid token"}, 401
     
-    # TODO: Check if date is available
-
     free_time = await db.post_free_time(uuid, data)
 
     if free_time is None:
@@ -452,6 +407,51 @@ async def toggle_email_recieve(uuid):
     if success:
         return {"code": 200, "message": "Email sending toggled", "current_value": data["value"]}, 200
     return {"code": 404, "message": "Lecturer not found"}, 404
+
+
+# Server utilities
+
+""" @app.before_request
+async def check_db_connection_before_request():
+    if not db.check_db_connection():
+        await db.init() """
+
+
+@app.route("/api/conn")
+async def check_db_connection():
+    await db.init()
+    return {"msg": "Tried to renew connection."}, 200
+
+
+@app.route("/api/log")
+async def log():
+    with open("logs.log", "r") as file:
+        return file.read(), 200
+
+
+@app.route("/api/dbpasswd", methods=["POST"])
+async def post_update_dbpassword():
+    with open("password.txt", "w+") as file:
+        file.write((await request.form)["password"])
+
+    await db.init()
+    return "Updated database password", 200
+
+
+@app.route("/api/emailpasswd", methods=["POST"])
+async def post_update_emailpassword():
+    with open("email_password.txt", "w+") as file:
+        file.write((await request.form)["password"])
+
+    utils.email.update_password()
+    return "Updated email password", 200
+
+
+@app.route("/api/basicauth", methods=["POST"])
+async def post_update_basicauth():
+    app.config["QUART_AUTH_BASIC_USERNAME"] = (await request.form)["username"]
+    app.config["QUART_AUTH_BASIC_PASSWORD"] = (await request.form)["password"]    
+    return "Basic Auth updated", 200
 
 
 async def exit_handler() -> None:
