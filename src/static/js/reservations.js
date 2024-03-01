@@ -224,7 +224,7 @@ function createSegment(start, end, type, uuid) {
         element.addEventListener("click", openPopup);
         element.style.cursor = "pointer";
     } else if (type == "free_time" && token != null) {
-        element.addEventListener("click", deleteFreeTime);
+        element.addEventListener("click", function() { deleteFreeTime(uuid) });
         element.style.cursor = "pointer";
     } else if ((type == "reservation_confirmed" || type == "reservation_unconfirmed") && token != null) {
         element.addEventListener("click", function () { openPopup2(uuid) });
@@ -393,7 +393,7 @@ function deleteReservation() {
         });
 }
 
-function deleteFreeTime(e) {
+function deleteFreeTime(free_time_uuid) {
     if (!confirm("Opravdu chcete smazat tento volný čas?")) {
         return;
     }
@@ -405,7 +405,7 @@ function deleteFreeTime(e) {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            uuid: e.target.getAttribute("uuid"),
+            uuid: free_time_uuid,
             token: token
         })
     })

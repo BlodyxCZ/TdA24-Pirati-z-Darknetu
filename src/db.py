@@ -93,6 +93,7 @@ async def post_lecturer(data) -> dict:
         data["tags"] = []
     
     data["password"] = bcrypt.hashpw(bytes(data["password"], "utf-8"), bcrypt.gensalt()).decode()
+    data["recieve_email"] = True
 
     lecturer = (await db.query("SELECT *, meta::id(id) AS uuid OMIT id, tags FROM (CREATE lecturers:uuid() CONTENT $data);", vars={
         "data": data

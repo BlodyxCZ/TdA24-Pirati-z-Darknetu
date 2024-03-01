@@ -271,8 +271,9 @@ async def post_reservation(uuid):
 
     try:
         lecturer = await db.get_lecturer(uuid)
-        logging.info(f"Sending email to {lecturer['contact']['emails'][0]}")
-        utils.email.send_new_reservation_email(lecturer["contact"]["emails"][0], response)
+        if (lecturer["recieve_email"]):
+            logging.info(f"Sending email to {lecturer['contact']['emails'][0]}")
+            utils.email.send_new_reservation_email(lecturer["contact"]["emails"][0], response)
     except:
         pass
 
