@@ -32,4 +32,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.reload();
             });
     });
+
+    const emailCheckBox = document.getElementById("receive-emails");
+    emailCheckBox.addEventListener("change", (e) => {
+        // Blame the backend guy for the spelling
+        fetch(`/api/lecturers/${uuid}/recieve-emails`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                token: token,
+                value: emailCheckBox.checked
+            })
+        })
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json);
+                alert(json.message);
+            });
+    });
 });
