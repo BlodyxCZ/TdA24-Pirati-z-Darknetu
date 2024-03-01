@@ -9,6 +9,9 @@
         <link href="https://fonts.googleapis.com/css?family=Lalezar" rel="stylesheet" type="text/css">
         <link rel="stylesheet" href="/css/profile.css">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <script type="text/javascript">
+            const uuid = "{{ lecturer['uuid'] }}";
+        </script>
         <script type="text/javascript" src="/js/cookie.js"></script>
         <script type="text/javascript" src="/js/profile.js"></script>
         <title>Teacher Digital Agency</title>
@@ -21,9 +24,10 @@
                     <div>
                         <img id="avatar-image" class="avatar-image" src="{{ lecturer['picture_url'] }}">
                     </div>
-                    <div id="avatar-change-button" class="change-button">
+                    <!-- No -->
+                    <!-- <div id="avatar-change-button" class="button">
                         ZMĚNIT
-                    </div>
+                    </div> -->
                 </div>
                 <div class="separator">
 
@@ -33,7 +37,8 @@
                         <div class="split-h">
                             <div>
                                 <table>
-                                    <tr>
+                                    <!-- I give up. -->
+                                    <!-- <tr>
                                         <td>
                                             <label for="first-name">Jméno:</label>
                                         </td>
@@ -76,16 +81,24 @@
                                             <input id="title-after" type="text"
                                                 placeholder="{{ lecturer['title_after'] }}">
                                         </td>
+                                    </tr> -->
+                                    <tr>
+                                        <td>
+                                            <label for="old-password">Heslo:</label>
+                                        </td>
+                                        <td>
+                                            <input autocomplete="password" id="old-password" type="password">
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <label for="password">Heslo:</label>
+                                            <label for="new-password">Nové heslo:</label>
                                         </td>
                                         <td>
-                                            <input autocomplete="new-password" id="password" type="password">
+                                            <input autocomplete="new-password" id="new-password" type="password">
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <!-- <tr>
                                         <td>
                                             <label for="email">E-mail:</label>
                                         </td>
@@ -127,10 +140,10 @@
                                             <input id="price" type="text"
                                                 placeholder="{{ lecturer['price_per_hour'] }}">
                                         </td>
-                                    </tr>
+                                    </tr> -->
                                 </table>
                             </div>
-                            <div>
+                            <!-- <div>
                                 <table>
                                     <tr>
                                         <td>
@@ -141,7 +154,7 @@
                                         </td>
                                     </tr>
                                 </table>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                     <div id="info-change-button" class="button">

@@ -318,7 +318,7 @@ async def delete_reservation():
     return {"code": 404, "message": "Reservation not found"}, 404
 
 
-@app.route("/api/lecturers/<uuid>/password-change", methods=["PUT"])
+@app.route("/api/lecturers/<uuid>/password-change", methods=["POST"])
 async def change_password(uuid):
     data = await request.get_json()
 
